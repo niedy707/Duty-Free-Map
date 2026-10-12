@@ -17,11 +17,13 @@ SEMA = """
 CREATE TABLE yer (
     kod     TEXT PRIMARY KEY,           -- IATA kodu ya da şehir mağazası kısaltması
     ad      TEXT NOT NULL,
+    ad_en   TEXT,
     ulke    TEXT NOT NULL,
     tur     TEXT NOT NULL CHECK (tur IN ('duty-free', 'şehir mağazası')),
     magaza  TEXT,
     lat     REAL,
-    lon     REAL
+    lon     REAL,
+    arama   TEXT                        -- arama sözcükleri (şehir adı, yazım çeşitleri)
 );
 CREATE TABLE gozlem (
     id              INTEGER PRIMARY KEY,
@@ -44,6 +46,8 @@ CREATE TABLE gozlem (
     kur_eur         REAL,
     fiyat_eur       REAL,
     eur_litre       REAL,
+    kur_try         REAL,               -- o gün 1 EUR kaç TL (ECB)
+    fiyat_try       REAL,
     kaynak          TEXT,               -- raf etiketi / fiş
     guven           TEXT NOT NULL CHECK (guven IN ('kesin', 'kısmi')),
     aciklama        TEXT,
@@ -54,11 +58,18 @@ CREATE INDEX gozlem_yer_tarih ON gozlem (yer_kod, tarih);
 CREATE TABLE piyasa (
     id         INTEGER PRIMARY KEY,
     tarih      TEXT NOT NULL,
+    ulke       TEXT,                    -- JP, EU, GB, FR ya da GLOBAL
+    tur        TEXT,                    -- yerel (perakende) · öneri (liste fiyatı) · duty-free · müzayede
+    marka      TEXT,
+    urun_anahtar TEXT,                  -- gozlem.urun ile eşleşen kısa ad (parantezsiz)
+    hacim_ml   INTEGER,
     urun       TEXT NOT NULL,
     pazar      TEXT NOT NULL,
+    pazar_en   TEXT,
     para       TEXT NOT NULL,
     fiyat_alt  REAL,
     fiyat_ust  REAL,
+    kur_eur    REAL,
     aciklama   TEXT,
     kaynak     TEXT
 );
@@ -66,7 +77,10 @@ CREATE TABLE piyasa (
 
 GOZLEM = ["id", "tarih", "saat_yerel", "yer_kod", "kategori", "marka", "urun", "yas", "hacim_ml", "abv", "para", "fiyat",
           "fiyat_vergisiz", "fiyat_ab_ici", "liste_fiyat", "indirim_yuzde", "coklu_teklif", "kur_eur", "fiyat_eur",
-          "eur_litre", "kaynak", "guven", "not", "foto"]
+          "eur_litre", "kur_try", "fiyat_try", "kaynak", "guven", "not", "foto"]
+YER = ["kod", "ad", "ad_en", "ulke", "tur", "magaza", "lat", "lon", "arama"]
+PIYASA = ["tarih", "ulke", "tur", "marka", "urun_anahtar", "hacim_ml", "urun", "pazar", "pazar_en", "para", "fiyat_alt", "fiyat_ust",
+          "kur_eur", "not", "kaynak"]
 OZEL = os.path.join("ozel", "gozlem_ozel.csv")
 
 
@@ -91,12 +105,10 @@ def main():
         o = ozel.get(g["id"], {})
         g["saat_yerel"], g["foto"] = o.get("saat_yerel", ""), o.get("foto", "")
         g["not"] = o.get("not_ozel") or g["not"]
-    db.executemany("INSERT INTO yer VALUES (?,?,?,?,?,?,?)",
-                   [[bos(y[k]) for k in ("kod", "ad", "ulke", "tur", "magaza", "lat", "lon")] for y in yerler])
+    db.executemany(f"INSERT INTO yer VALUES ({','.join('?' * len(YER))})", [[bos(y[k]) for k in YER] for y in yerler])
     db.executemany(f"INSERT INTO gozlem VALUES ({','.join('?' * len(GOZLEM))})",
                    [[bos(g[k]) for k in GOZLEM] for g in gozlemler])
-    db.executemany("INSERT INTO piyasa (tarih, urun, pazar, para, fiyat_alt, fiyat_ust, aciklama, kaynak) VALUES (?,?,?,?,?,?,?,?)",
-                   [[bos(p[k]) for k in ("tarih", "urun", "pazar", "para", "fiyat_alt", "fiyat_ust", "not", "kaynak")] for p in piyasa])
+    db.executemany(f"INSERT INTO piyasa VALUES (NULL,{','.join('?' * len(PIYASA))})", [[bos(p[k]) for k in PIYASA] for p in piyasa])
     db.commit()
     sayim = {t: db.execute(f"SELECT count(*) FROM {t}").fetchone()[0] for t in ("yer", "gozlem", "piyasa")}
     db.close()

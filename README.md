@@ -3,9 +3,23 @@
 Havalimanı duty-free mağazalarında **raf etiketinden okunmuş** içki fiyatları ve bunları
 havalimanları arasında kıyaslamak için küçük bir araç.
 
+**Site:** https://duty-free-map.vercel.app — arayüz İngilizce (varsayılan), Almanca, İspanyolca, Türkçe.
+
 Asıl soru: *kalkış havalimanında mı almalı, varışta mı?* Aynı şişe iki havalimanında farklı
 fiyata satılıyor; varışta ucuz olan ürünü kalkışta almak mantıksız. Bu depo o kıyasın verisini
 ve tek dosyalık bir kıyas sayfasını üretir.
+
+Sitede:
+
+- **Rota:** uçuş kodu (ör. `TK199`) ya da havalimanı adı yazılır, kalkış ve varış otomatik seçilir.
+  İki havalimanında da görülen ürünler kıyaslanır; yalnız birinde görülenler ayrı listelenir.
+  Bir yerde aynı ürünün birden çok kaydı varsa hepsi tarihiyle gösterilir.
+- **Yerel piyasa:** kalkış ve varış ülkesi için varsa mağaza dışı perakende fiyatı ve şehir
+  mağazası gözlemleri, duty-free fiyatının yanında.
+- **Bir ürün, tüm yerler:** bir ürünün hangi havalimanında hangi tarihte kaça görüldüğü.
+- Her fiyat avro karşılığıyla, varsa yerel para birimiyle ve o günkü kurla TL karşılığıyla gösterilir.
+
+Uçuş kodundan rota bulmak için ziyaretçinin tarayıcısı `api.adsbdb.com`'a yalnız uçuş kodunu gönderir.
 
 Veriler raf fotoğraflarıyla büyür. Ne kadar güncel fotoğraf eklenirse o kadar çok kişi
 faydalanabilir. Şimdilik tek kişinin gözlemleridir; fotoğraf yükleme akışı henüz yok.
@@ -15,17 +29,17 @@ faydalanabilir. Şimdilik tek kişinin gözlemleridir; fotoğraf yükleme akış
 | Dosya | İçerik |
 |---|---|
 | `fiyatlar.csv` | **Kaynak.** Okunan her fiyat bir satır |
-| `yerler.csv` | **Kaynak.** Havalimanı / mağaza listesi (IATA kodu, ülke, mağaza adı, konum) |
-| `piyasa.csv` | **Kaynak.** Mağaza dışı referans fiyatlar (tarih + kaynak adresi) |
+| `yerler.csv` | **Kaynak.** Havalimanı / mağaza listesi (IATA kodu, Türkçe ve İngilizce ad, ülke, mağaza, konum, arama sözcükleri) |
+| `piyasa.csv` | **Kaynak.** Mağaza dışı referans fiyatlar: ülke, tür (`yerel` · `öneri` · `duty-free` · `müzayede`), `fiyatlar.csv` ile eşleşen marka + ürün anahtarı, fiyat aralığı, kur, kaynak adresi |
 | `db_kur.py` | Üç CSV'den SQLite `fiyatlar.db`'yi kurar (`yer`, `gozlem`, `piyasa` tabloları) |
-| `sayfa_kur.py`, `sayfa_sablon.html` | Tek dosyalık kıyas sayfası `sayfa.html`'i üretir (veri içine gömülü) |
+| `sayfa_kur.py`, `sayfa_sablon.html` | Tek dosyalık kıyas sayfasını üretir (veri içine gömülü): `site/index.html` yayın sürümü. CSV'deki Türkçe açıklamaları İngilizceye çevirir; çevrilmemiş metin kalırsa durur |
 
 ```bash
 python3 db_kur.py      # fiyatlar.db
-python3 sayfa_kur.py   # sayfa.html — tarayıcıda açılır, sunucu gerekmez
+python3 sayfa_kur.py   # site/index.html — tarayıcıda açılır, sunucu gerekmez
 ```
 
-Yalnız Python 3 standart kitaplığı kullanılır. `fiyatlar.db` ve `sayfa.html` türetilmiştir, depoya girmez.
+Yalnız Python 3 standart kitaplığı kullanılır. `fiyatlar.db`, `sayfa.html` ve `site/` türetilmiştir, depoya girmez.
 
 ## `fiyatlar.csv` sütunları
 
@@ -44,6 +58,7 @@ Yalnız Python 3 standart kitaplığı kullanılır. `fiyatlar.db` ve `sayfa.htm
 | `indirim_yuzde` | O anki indirim: etikette yazan ("Save 15%") ya da liste fiyatından hesaplanan |
 | `coklu_teklif` | "2 şişe …", "2. ürüne %15" türü kampanya |
 | `kur_eur`, `fiyat_eur`, `eur_litre` | O günkü ECB kuruyla avro karşılığı ve litre fiyatı |
+| `kur_try`, `fiyat_try` | O gün 1 avronun TL karşılığı (ECB) ve fiyatın TL karşılığı |
 | `kaynak` | `raf etiketi` · `fiş` · `raf etiketi + fiş` |
 | `guven` | `kesin` ya da `kısmi` (etiket kesik/örtülü, düşük çözünürlükten okundu, ürün adı görünmüyor) |
 | `not` | Açıklama |

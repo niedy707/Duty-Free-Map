@@ -1,7 +1,7 @@
-<title>Duty Free Defteri</title>
+<title>Duty Free Map</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Yerleşim: tek sütun, telefon öncelikli. Üstte rota kıyası (kalkış ↔ varış), altında aranabilir fiyat defteri.
+/* Yerleşim: tek sütun, telefon öncelikli. Üstte rota (uçuş kodu ya da iki havalimanı), altında ürün bazlı fiyat listesi.
    Dil: havalimanı yönlendirme tabelası — sarı zemin üstünde koyu IATA kodu, fiyatlar eş aralıklı rakamla. */
 :root {
   --zemin: #f3f4f1; --kagit: #ffffff; --murekkep: #14191f; --soluk: #5d6772; --cizgi: #d9dcd6;
@@ -19,12 +19,17 @@
 
 body { background: var(--zemin); color: var(--murekkep); font: 15px/1.45 var(--govde); padding-inline: 16px; padding-block: 20px 48px; }
 .sayfa { max-width: 760px; margin-inline: auto; display: grid; gap: 28px; }
-h1 { font: 700 34px/1 var(--baslik); letter-spacing: .01em; margin: 0; text-wrap: balance; }
-h2 { font: 700 22px/1.1 var(--baslik); letter-spacing: .02em; text-transform: uppercase; margin: 0; }
+h1 { font: 700 34px/1 var(--baslik); letter-spacing: .01em; margin: 0; }
+h2 { font: 700 22px/1.1 var(--baslik); letter-spacing: .02em; text-transform: uppercase; margin: 0; text-wrap: balance; }
+h3 { font: 600 13px/1.2 var(--govde); letter-spacing: .06em; text-transform: uppercase; color: var(--soluk); margin: 6px 0 0; }
 .ust { display: grid; gap: 8px; }
+.ust-satir { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
 .ust p { margin: 0; color: var(--soluk); max-width: 62ch; }
 .sayilar { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 13px var(--rakam); color: var(--soluk); }
 .sayilar b { color: var(--murekkep); font-weight: 500; }
+.diller { display: flex; gap: 4px; }
+.diller button { font: 600 12px var(--govde); letter-spacing: .04em; background: transparent; color: var(--soluk); border: 1px solid var(--cizgi); border-radius: 4px; padding: 5px 8px; cursor: pointer; }
+.diller button[aria-pressed="true"] { background: var(--murekkep); color: var(--zemin); border-color: var(--murekkep); }
 
 .kod { display: inline-block; background: var(--tabela); color: var(--tabela-yazi); font: 700 15px/1 var(--baslik); letter-spacing: .04em;
   padding: 4px 6px 3px; border-radius: 3px; white-space: nowrap; }
@@ -33,19 +38,20 @@ h2 { font: 700 22px/1.1 var(--baslik); letter-spacing: .02em; text-transform: up
 .bolum { display: grid; gap: 14px; }
 .denetim { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
 .denetim label { display: grid; gap: 4px; font-size: 12px; color: var(--soluk); flex: 1 1 150px; min-width: 0; }
-select, input[type="search"] { font: 15px var(--govde); color: var(--murekkep); background: var(--kagit); border: 1px solid var(--cizgi);
-  border-radius: 6px; padding: 9px 10px; width: 100%; min-width: 0; }
-button.cevir { font: 600 18px/1 var(--govde); background: var(--kagit); color: var(--murekkep); border: 1px solid var(--cizgi); border-radius: 6px;
-  padding: 9px 13px; cursor: pointer; }
-select:focus-visible, input:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--tabela); outline-offset: 2px; }
+select, input[type="search"], input[type="text"] { font: 15px var(--govde); color: var(--murekkep); background: var(--kagit); border: 1px solid var(--cizgi);
+  border-radius: 6px; padding: 9px 10px; width: 100%; min-width: 0; box-sizing: border-box; }
+button.dugme { font: 600 15px/1 var(--govde); background: var(--murekkep); color: var(--zemin); border: 1px solid var(--murekkep); border-radius: 6px; padding: 11px 16px; cursor: pointer; }
+button.cevir { font: 600 18px/1 var(--govde); background: var(--kagit); color: var(--murekkep); border: 1px solid var(--cizgi); border-radius: 6px; padding: 9px 13px; cursor: pointer; }
+select:focus-visible, input:focus-visible, button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--tabela); outline-offset: 2px; }
+.durum { font-size: 13px; color: var(--soluk); min-height: 1.3em; }
 
 .liste { display: grid; gap: 10px; }
 .kart { background: var(--kagit); border: 1px solid var(--cizgi); border-radius: 8px; padding: 12px 14px; display: grid; gap: 10px; min-width: 0; }
 .urun { font-weight: 600; overflow-wrap: anywhere; }
 .urun small { font-weight: 400; color: var(--soluk); }
-.iki { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.yan { display: grid; gap: 3px; align-content: start; min-width: 0; }
-.fiyat { font: 500 19px/1.2 var(--rakam); font-variant-numeric: tabular-nums; }
+.iki { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .iki { grid-template-columns: 1fr; } }
+.yan { display: grid; gap: 6px; align-content: start; min-width: 0; }
 .alt { font-size: 12px; color: var(--soluk); overflow-wrap: anywhere; }
 .hukum { font-size: 13px; font-weight: 600; padding: 6px 9px; border-radius: 5px; }
 .hukum.ucuz { background: var(--ucuz-zemin); color: var(--ucuz); }
@@ -54,60 +60,67 @@ select:focus-visible, input:focus-visible, button:focus-visible, summary:focus-v
 .bos { color: var(--soluk); padding: 14px; border: 1px dashed var(--cizgi); border-radius: 8px; }
 
 .satir { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: baseline; padding-top: 8px; border-top: 1px solid var(--cizgi); }
-.satir:first-of-type { border-top: 0; padding-top: 0; }
+.satir:first-child { border-top: 0; padding-top: 0; }
 .satir .f { font: 500 15px var(--rakam); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .satir .a { grid-column: 2 / -1; font-size: 12px; color: var(--soluk); overflow-wrap: anywhere; }
 .rozet { font: 500 11px var(--rakam); padding: 1px 5px; border-radius: 3px; background: var(--ucuz-zemin); color: var(--ucuz); white-space: nowrap; }
 .kismi { color: var(--pahali); }
 .enucuz .f { color: var(--ucuz); }
-details { background: var(--kagit); border: 1px solid var(--cizgi); border-radius: 8px; padding: 10px 14px; }
-summary { cursor: pointer; font-weight: 600; }
-.tablo { overflow-x: auto; margin-top: 10px; }
-table { border-collapse: collapse; font-size: 13px; min-width: 560px; }
-th, td { text-align: left; padding: 6px 10px 6px 0; border-top: 1px solid var(--cizgi); vertical-align: top; }
-th { color: var(--soluk); font-weight: 500; border-top: 0; }
-td.r { font-family: var(--rakam); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pazar { display: grid; gap: 4px; border-top: 1px dashed var(--cizgi); padding-top: 8px; font-size: 13px; }
+.pazar .ad { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--soluk); }
+.pazar .ref { display: flex; flex-wrap: wrap; gap: 2px 10px; justify-content: space-between; }
+.pazar .ref span:last-child { font-family: var(--rakam); font-variant-numeric: tabular-nums; }
 a { color: inherit; }
-.dip { font-size: 12px; color: var(--soluk); max-width: 70ch; }
+.katki { display: grid; gap: 8px; border-left: 4px solid var(--tabela); padding-left: 14px; }
+.katki p { margin: 0; max-width: 62ch; }
+.dip { font-size: 12px; color: var(--soluk); max-width: 70ch; margin: 0; }
 </style>
 
 <div class="sayfa">
   <header class="ust">
-    <h1>Duty Free Defteri</h1>
-    <p>Kendi çektiğim raf etiketlerinden okunan içki fiyatları. Kalkış ve varış havalimanını seç; ikisinde de gördüğüm ürünlerin hangisinde ucuz olduğunu gösterir.</p>
+    <div class="ust-satir">
+      <h1>Duty Free Map</h1>
+      <div class="diller" role="group" aria-label="Language">
+        <button type="button" data-dil="en">EN</button><button type="button" data-dil="de">DE</button><button type="button" data-dil="es">ES</button><button type="button" data-dil="tr">TR</button>
+      </div>
+    </div>
+    <p data-t="tagline"></p>
     <div class="sayilar" id="sayilar"></div>
   </header>
 
   <section class="bolum" aria-labelledby="b-rota">
-    <h2 id="b-rota">Rota kıyası</h2>
+    <h2 id="b-rota" data-t="hRoute"></h2>
+    <form class="denetim" id="ucus-form">
+      <label for="ucus"><span data-t="flightLabel"></span><input id="ucus" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" data-tp="flightPh"></label>
+      <button class="dugme" type="submit" data-t="find"></button>
+    </form>
+    <div class="durum" id="durum" role="status"></div>
     <div class="denetim">
-      <label for="kalkis">Kalkış<select id="kalkis"></select></label>
-      <button class="cevir" id="cevir" type="button" aria-label="Kalkış ve varışı yer değiştir">⇄</button>
-      <label for="varis">Varış<select id="varis"></select></label>
+      <label for="kalkis"><span data-t="from"></span><select id="kalkis"></select></label>
+      <button class="cevir" id="cevir" type="button" data-ta="swap">⇄</button>
+      <label for="varis"><span data-t="to"></span><select id="varis"></select></label>
     </div>
     <div class="liste" id="rota"></div>
   </section>
 
-  <section class="bolum" aria-labelledby="b-defter">
-    <h2 id="b-defter">Fiyat defteri</h2>
+  <section class="bolum" aria-labelledby="b-urun">
+    <h2 id="b-urun" data-t="hProducts"></h2>
     <div class="denetim">
-      <label for="ara" style="flex-basis:100%">Ürün ya da marka<input id="ara" type="search" placeholder="macallan, rakı, double black…" autocomplete="off"></label>
-      <label for="kat">Tür<select id="kat"></select></label>
-      <label for="yer">Yer<select id="yer"></select></label>
+      <label for="ara" style="flex-basis:100%"><span data-t="searchLabel"></span><input id="ara" type="search" list="urunler" autocomplete="off" data-tp="searchPh"></label>
+      <datalist id="urunler"></datalist>
+      <label for="kat"><span data-t="type"></span><select id="kat"></select></label>
     </div>
-    <div class="alt" id="defter-ozet"></div>
-    <div class="liste" id="defter"></div>
+    <div class="alt" id="urun-ozet"></div>
+    <div class="liste" id="urunliste"></div>
   </section>
 
-  <section class="bolum" aria-labelledby="b-piyasa">
-    <h2 id="b-piyasa">Piyasa referansları</h2>
-    <details>
-      <summary id="piyasa-baslik">Mağaza dışı fiyatlar</summary>
-      <div class="tablo"><table id="piyasa"></table></div>
-    </details>
+  <section class="katki" aria-labelledby="b-katki">
+    <h2 id="b-katki" data-t="hAdd"></h2>
+    <p data-t="add1"></p>
+    <p><span data-t="add2a"></span><a href="https://github.com/niedy707/Duty-Free-Map" rel="noopener">GitHub</a><span data-t="add2b"></span></p>
   </section>
 
-  <p class="dip" id="dip"></p>
+  <p class="dip" data-t="foot"></p>
 </div>
 
 <script id="veri" type="application/json">/*VERI*/</script>
@@ -115,112 +128,256 @@ a { color: inherit; }
 const V = JSON.parse(document.getElementById("veri").textContent);
 const YER = Object.fromEntries(V.yerler.map(y => [y.kod, y]));
 const G = V.gozlem.filter(g => g.kategori !== "sigara");
-const $ = id => document.getElementById(id);
-const para = (n, p) => n == null ? "—" : n.toLocaleString("tr-TR", { minimumFractionDigits: p === "JPY" || p === "DKK" || p === "SEK" ? 0 : 2, maximumFractionDigits: 2 }) + " " + ({ EUR: "€", JPY: "¥", DKK: "DKK", SEK: "SEK" }[p] || p);
-const tarih = t => t.split("-").reverse().join(".");
-const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const taban = g => (g.marka + " " + g.urun.replace(/\s*\([^)]*\)/g, "")).trim();
-const anahtar = g => taban(g).toLocaleLowerCase("tr");
-const hacim = ml => ml ? (ml >= 1000 ? (ml / 1000).toLocaleString("tr-TR") + " L" : ml / 10 + " cl") : "hacim ?";
-const kod = k => `<span class="kod${YER[k].tur === "duty-free" ? "" : " sehir"}" title="${esc(YER[k].ad)}">${esc(k.replace("TYO-", ""))}</span>`;
+const AB = new Set(["BE", "IT", "DK", "SE", "DE", "FR"]);
+const YEREL = { en: "en-GB", de: "de-DE", es: "es-ES", tr: "tr-TR" };
+const KAT = {
+  en: { viski: "Whisky", konyak: "Cognac", rom: "Rum", "rakı": "Rakı", "likör": "Liqueur", "şarap": "Wine", "şampanya": "Champagne", bira: "Beer" },
+  de: { viski: "Whisky", konyak: "Cognac", rom: "Rum", "rakı": "Rakı", "likör": "Likör", "şarap": "Wein", "şampanya": "Champagner", bira: "Bier" },
+  es: { viski: "Whisky", konyak: "Coñac", rom: "Ron", "rakı": "Rakı", "likör": "Licor", "şarap": "Vino", "şampanya": "Champán", bira: "Cerveza" },
+  tr: { viski: "Viski", konyak: "Konyak", rom: "Rom", "rakı": "Rakı", "likör": "Likör", "şarap": "Şarap", "şampanya": "Şampanya", bira: "Bira" } };
+const ULKE = {
+  en: { TR: "Türkiye", JP: "Japan", KKTC: "North Cyprus", BE: "Belgium", IT: "Italy", DK: "Denmark", SE: "Sweden", DE: "Germany" },
+  de: { TR: "der Türkei", JP: "Japan", KKTC: "Nordzypern", BE: "Belgien", IT: "Italien", DK: "Dänemark", SE: "Schweden", DE: "Deutschland" },
+  es: { TR: "Turquía", JP: "Japón", KKTC: "Chipre del Norte", BE: "Bélgica", IT: "Italia", DK: "Dinamarca", SE: "Suecia", DE: "Alemania" },
+  tr: { TR: "Türkiye", JP: "Japonya", KKTC: "Kuzey Kıbrıs", BE: "Belçika", IT: "İtalya", DK: "Danimarka", SE: "İsveç", DE: "Almanya" } };
+const T = {
+en: { tagline: "Liquor prices read from duty-free shelf tags. Enter your flight or pick two airports to see where each bottle is cheaper.",
+  sPrices: "{n} prices", sAirports: "{n} airports", sUpdated: "updated {d}", hRoute: "Your route", flightLabel: "Flight number or destination", flightPh: "TK199, Tokyo, IST…", find: "Find",
+  from: "From", to: "To", swap: "Swap from and to", none: "— not selected —", looking: "Looking up the flight…", flightFound: "{code}: {a} → {b}.", noData: "No prices recorded for {x} yet.",
+  flightNotFound: "Couldn't find flight {code}. Pick the airports below.", lookupFailed: "Flight lookup isn't available right now. Pick the airports below.", destSet: "Destination set to {x}.",
+  pickHint: "Pick a departure or arrival airport.", same: "Departure and arrival are the same.", gBoth: "At both ({n})", gOnly: "Only seen at {x} ({n})",
+  nothing: "No prices recorded on this route yet. They'll appear as photos are added.", vSame: "About the same price", vTo: "{p}% cheaper at arrival — don't buy at departure", vFrom: "{p}% cheaper at departure — buy before you fly",
+  wLitre: "different bottle sizes, compared per litre", wSize: "bottle size unreadable on one side", wYears: "{y} years between the two prices", latest: "verdict uses the latest price on each side, in EUR",
+  localMarket: "Local market in {c}", lBelow: "{p}% below the local market", lAbove: "{p}% above the local market", lSame: "about the same as the local market",
+  perLitre: "{x} per litre", list: "list {x}", euDest: "EU destination {x}", receipt: "confirmed by receipt", partial: "partial reading", sizeUnknown: "size ?", tryApprox: "≈ {x} TRY",
+  hProducts: "One product, every location", searchLabel: "Product or brand", searchPh: "chivas 18, macallan, rakı…", type: "Type", all: "All", summary: "{a} products · {b} prices", noMatch: "No matching records.", refs: "Market references",
+  hAdd: "The data grows with you", add1: "The data on this site grows thanks to its users. The more up-to-date photos you and others add, the more people benefit.",
+  add2a: "Photo upload isn't available yet. For now you can share shelf-tag photos and get the full data set on ", add2b: ".",
+  foot: "EUR and TRY equivalents use the ECB rate on the day the price was seen. “Partial reading” marks tags that were cut off, covered or low-resolution. These are shelf prices on the day they were seen and may have changed. This site does not sell or promote anything." },
+de: { tagline: "Spirituosenpreise, direkt von Duty-free-Regaletiketten abgelesen. Flugnummer eingeben oder zwei Flughäfen wählen und sehen, wo jede Flasche günstiger ist.",
+  sPrices: "{n} Preise", sAirports: "{n} Flughäfen", sUpdated: "aktualisiert {d}", hRoute: "Deine Route", flightLabel: "Flugnummer oder Ziel", flightPh: "TK199, Tokyo, IST…", find: "Suchen",
+  from: "Von", to: "Nach", swap: "Von und Nach tauschen", none: "— nicht gewählt —", looking: "Flug wird gesucht…", flightFound: "{code}: {a} → {b}.", noData: "Für {x} sind noch keine Preise erfasst.",
+  flightNotFound: "Flug {code} nicht gefunden. Wähle die Flughäfen unten.", lookupFailed: "Die Flugsuche ist gerade nicht verfügbar. Wähle die Flughäfen unten.", destSet: "Ziel: {x}.",
+  pickHint: "Wähle einen Abflug- oder Zielflughafen.", same: "Abflug und Ziel sind identisch.", gBoth: "An beiden ({n})", gOnly: "Nur in {x} gesehen ({n})",
+  nothing: "Für diese Route sind noch keine Preise erfasst. Sie erscheinen, sobald Fotos hinzukommen.", vSame: "Etwa gleicher Preis", vTo: "Am Ziel {p}% günstiger — nicht beim Abflug kaufen", vFrom: "Beim Abflug {p}% günstiger — vor dem Flug kaufen",
+  wLitre: "unterschiedliche Flaschengrößen, pro Liter verglichen", wSize: "Flaschengröße auf einer Seite nicht lesbar", wYears: "{y} Jahre zwischen den beiden Preisen", latest: "Urteil nach dem jeweils neuesten Preis, in EUR",
+  localMarket: "Lokaler Markt in {c}", lBelow: "{p}% unter dem lokalen Markt", lAbove: "{p}% über dem lokalen Markt", lSame: "etwa wie der lokale Markt",
+  perLitre: "{x} pro Liter", list: "Liste {x}", euDest: "EU-Ziel {x}", receipt: "per Kassenbon bestätigt", partial: "teilweise gelesen", sizeUnknown: "Größe ?", tryApprox: "≈ {x} TRY",
+  hProducts: "Ein Produkt, alle Orte", searchLabel: "Produkt oder Marke", searchPh: "chivas 18, macallan, rakı…", type: "Art", all: "Alle", summary: "{a} Produkte · {b} Preise", noMatch: "Keine passenden Einträge.", refs: "Marktreferenzen",
+  hAdd: "Die Daten wachsen mit euch", add1: "Die Daten auf dieser Seite wachsen dank ihrer Nutzer. Je mehr aktuelle Fotos du und andere hinzufügen, desto mehr Menschen profitieren.",
+  add2a: "Einen Foto-Upload gibt es noch nicht. Bis dahin kannst du Fotos von Regaletiketten teilen und den gesamten Datensatz abrufen auf ", add2b: ".",
+  foot: "EUR- und TRY-Werte nutzen den EZB-Kurs des Tages, an dem der Preis gesehen wurde. „Teilweise gelesen“ markiert Etiketten, die abgeschnitten, verdeckt oder unscharf waren. Es sind Regalpreise vom jeweiligen Tag; sie können sich geändert haben. Diese Seite verkauft und bewirbt nichts." },
+es: { tagline: "Precios de bebidas leídos en las etiquetas de las tiendas duty free. Introduce tu vuelo o elige dos aeropuertos para ver dónde es más barata cada botella.",
+  sPrices: "{n} precios", sAirports: "{n} aeropuertos", sUpdated: "actualizado {d}", hRoute: "Tu ruta", flightLabel: "Número de vuelo o destino", flightPh: "TK199, Tokyo, IST…", find: "Buscar",
+  from: "Origen", to: "Destino", swap: "Intercambiar origen y destino", none: "— sin seleccionar —", looking: "Buscando el vuelo…", flightFound: "{code}: {a} → {b}.", noData: "Todavía no hay precios registrados para {x}.",
+  flightNotFound: "No se encontró el vuelo {code}. Elige los aeropuertos abajo.", lookupFailed: "La búsqueda de vuelos no está disponible ahora. Elige los aeropuertos abajo.", destSet: "Destino: {x}.",
+  pickHint: "Elige un aeropuerto de origen o de destino.", same: "El origen y el destino son el mismo.", gBoth: "En ambos ({n})", gOnly: "Solo visto en {x} ({n})",
+  nothing: "Todavía no hay precios registrados en esta ruta. Aparecerán cuando se añadan fotos.", vSame: "Precio casi igual", vTo: "{p}% más barato en destino — no lo compres en origen", vFrom: "{p}% más barato en origen — cómpralo antes de volar",
+  wLitre: "tamaños de botella distintos, comparado por litro", wSize: "tamaño de botella ilegible en un lado", wYears: "{y} años entre los dos precios", latest: "el veredicto usa el último precio de cada lado, en EUR",
+  localMarket: "Mercado local en {c}", lBelow: "{p}% por debajo del mercado local", lAbove: "{p}% por encima del mercado local", lSame: "casi igual que el mercado local",
+  perLitre: "{x} por litro", list: "lista {x}", euDest: "destino UE {x}", receipt: "confirmado con tique", partial: "lectura parcial", sizeUnknown: "tamaño ?", tryApprox: "≈ {x} TRY",
+  hProducts: "Un producto, todos los lugares", searchLabel: "Producto o marca", searchPh: "chivas 18, macallan, rakı…", type: "Tipo", all: "Todos", summary: "{a} productos · {b} precios", noMatch: "No hay registros que coincidan.", refs: "Referencias de mercado",
+  hAdd: "Los datos crecen contigo", add1: "Los datos de este sitio crecen gracias a sus usuarios. Cuantas más fotos actuales añadáis tú y otras personas, más gente se beneficiará.",
+  add2a: "Todavía no se pueden subir fotos. Por ahora puedes compartir fotos de etiquetas y obtener todos los datos en ", add2b: ".",
+  foot: "Los equivalentes en EUR y TRY usan el tipo del BCE del día en que se vio el precio. «Lectura parcial» indica etiquetas cortadas, tapadas o de baja resolución. Son precios de estantería del día en que se vieron y pueden haber cambiado. Este sitio no vende ni promociona nada." },
+tr: { tagline: "Duty-free raf etiketlerinden okunmuş içki fiyatları. Uçuş kodunu gir ya da iki havalimanı seç; her şişenin nerede ucuz olduğunu gör.",
+  sPrices: "{n} fiyat", sAirports: "{n} havalimanı", sUpdated: "güncelleme {d}", hRoute: "Rotan", flightLabel: "Uçuş kodu ya da varış yeri", flightPh: "TK199, Tokyo, IST…", find: "Bul",
+  from: "Kalkış", to: "Varış", swap: "Kalkış ve varışı yer değiştir", none: "— seçilmedi —", looking: "Uçuş aranıyor…", flightFound: "{code}: {a} → {b}.", noData: "{x} için henüz fiyat kaydı yok.",
+  flightNotFound: "{code} uçuşu bulunamadı. Havalimanlarını aşağıdan seç.", lookupFailed: "Uçuş araması şu an kullanılamıyor. Havalimanlarını aşağıdan seç.", destSet: "Varış: {x}.",
+  pickHint: "Kalkış ya da varış havalimanı seç.", same: "Kalkış ve varış aynı.", gBoth: "İkisinde de var ({n})", gOnly: "Yalnız {x} ({n})",
+  nothing: "Bu rotada henüz fiyat kaydı yok. Fotoğraf eklendikçe dolacak.", vSame: "Fiyat neredeyse aynı", vTo: "Varışta %{p} ucuz — kalkışta alma", vFrom: "Kalkışta %{p} ucuz — uçmadan al",
+  wLitre: "şişe boyları farklı, litre fiyatı kıyaslandı", wSize: "bir tarafta şişe boyu okunamadı", wYears: "iki fiyat arasında {y} yıl var", latest: "hüküm her iki taraftaki en yeni fiyata göre, avro üzerinden",
+  localMarket: "{c} yerel piyasa", lBelow: "yerel piyasanın %{p} altında", lAbove: "yerel piyasanın %{p} üstünde", lSame: "yerel piyasayla neredeyse aynı",
+  perLitre: "litresi {x}", list: "liste {x}", euDest: "AB içi varış {x}", receipt: "fişle doğrulandı", partial: "kısmi okuma", sizeUnknown: "hacim ?", tryApprox: "≈ {x} TL",
+  hProducts: "Bir ürün, tüm yerler", searchLabel: "Ürün ya da marka", searchPh: "chivas 18, macallan, rakı…", type: "Tür", all: "Hepsi", summary: "{a} ürün · {b} fiyat", noMatch: "Eşleşen kayıt yok.", refs: "Piyasa referansları",
+  hAdd: "Veriler sizinle büyür", add1: "Bu sitedeki veriler kullanıcılar sayesinde artmaktadır. Ne kadar güncel fotoğraf eklerseniz ve başkaları da eklerse o kadar çok insan faydalanabilir.",
+  add2a: "Fotoğraf yükleme henüz yok. Şimdilik raf etiketi fotoğraflarını paylaşmak ve verinin tamamını almak için: ", add2b: ".",
+  foot: "Avro ve TL karşılıkları fiyatın görüldüğü günün ECB kuruyla hesaplandı. “Kısmi okuma” etiketin kesik, örtülü ya da düşük çözünürlüklü olduğu satırlardır. Fiyatlar görüldüğü günün raf fiyatıdır, bugün farklı olabilir. Bu site satış ya da tanıtım yapmaz." } };
 
-// Bir yerde bir ürün+hacim için en yeni fiyatlı gözlem
-function sonGozlemler(yerKod) {
+let L = "en", sonDurum = null;
+const $ = id => document.getElementById(id);
+const t = (k, v = {}) => (T[L][k] ?? T.en[k]).replace(/\{(\w+)\}/g, (_, n) => v[n] ?? "");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const SIMGE = { EUR: "€", JPY: "¥", GBP: "£" };
+function para(n, p) {
+  if (n == null) return "—";
+  const k = p === "EUR" || p === "GBP" ? 2 : 0, s = n.toLocaleString(YEREL[L], { minimumFractionDigits: k, maximumFractionDigits: k });
+  return SIMGE[p] ? SIMGE[p] + s : s + " " + p;
+}
+const tam = n => Math.round(n).toLocaleString(YEREL[L]);
+const tarih = s => new Date(s + "T00:00:00").toLocaleDateString(YEREL[L], { day: "numeric", month: "short", year: "numeric" });
+const hacim = ml => ml ? (ml >= 1000 ? (ml / 1000).toLocaleString(YEREL[L]) + " L" : ml / 10 + " cl") : t("sizeUnknown");
+const parantezsiz = s => s.replace(/\s*\([^)]*\)/g, "").trim();
+const anahtar = g => (g.marka + " " + parantezsiz(g.urun)).trim().toLowerCase();
+const pAnahtar = p => (p.marka + " " + p.urun_anahtar).toLowerCase();
+const urunAdi = g => (g.marka + " " + parantezsiz(L === "tr" ? g.urun : g.urun_en)).trim();
+const ekAciklama = g => (L === "tr" ? g.urun : g.urun_en).match(/\(([^)]*)\)/)?.[1] || "";
+const yerAdi = y => L === "tr" ? y.ad : y.ad_en;
+const kod = k => `<span class="kod${YER[k].tur === "duty-free" ? "" : " sehir"}" title="${esc(yerAdi(YER[k]))}">${esc(k.replace("TYO-", ""))}</span>`;
+const yeniden = (a, b) => b.tarih.localeCompare(a.tarih);
+
+// Bir gözlem satırı: avro her zaman; yerel para, TL karşılığı ve diğer ayrıntılar alt satırda
+function satir(g, vurgu) {
+  const ek = [g.para !== "EUR" && g.fiyat != null ? para(g.fiyat, g.para) : "", g.fiyat_try != null ? t("tryApprox", { x: tam(g.fiyat_try) }) : "",
+    g.eur_litre != null && g.hacim_ml !== 1000 ? t("perLitre", { x: para(g.eur_litre, "EUR") }) : "", g.liste_fiyat ? t("list", { x: para(g.liste_fiyat, g.para) }) : "",
+    g.fiyat_ab_ici ? t("euDest", { x: para(g.fiyat_ab_ici, g.para) }) : "", L === "tr" ? g.teklif : g.teklif_en, g.kaynak && g.kaynak.includes("fiş") ? t("receipt") : "", ekAciklama(g)]
+    .filter(Boolean).map(esc);
+  if (g.guven === "kısmi") ek.push(`<span class="kismi">${esc(t("partial"))}</span>`);
+  return `<div class="satir${vurgu ? " enucuz" : ""}">${kod(g.yer_kod)}<div>${tarih(g.tarih)} · ${hacim(g.hacim_ml)} ${g.indirim_yuzde ? `<span class="rozet">−${Math.round(g.indirim_yuzde)}%</span>` : ""}</div>
+    <div class="f">${para(g.fiyat_eur, "EUR")}</div>${ek.length ? `<div class="a">${ek.join(" · ")}</div>` : ""}</div>`;
+}
+// Ülkedeki yerel piyasa: web'den doğrulanmış perakende referansları + o ülkedeki şehir mağazası gözlemleri
+function yerelPazar(k, ulke, haricYerler) {
+  const ref = V.piyasa.filter(p => pAnahtar(p) === k && p.tur === "yerel" && (p.ulke === ulke || (p.ulke === "EU" && AB.has(ulke))));
+  const sehir = G.filter(g => anahtar(g) === k && YER[g.yer_kod].tur !== "duty-free" && YER[g.yer_kod].ulke === ulke && g.fiyat_eur != null && !haricYerler.includes(g.yer_kod)).sort(yeniden);
+  const litre = ref.filter(p => p.eur_alt != null && p.hacim_ml).map(p => p.eur_alt / (p.hacim_ml / 1000)).concat(sehir.filter(g => g.eur_litre != null).map(g => g.eur_litre));
+  return { ref, sehir, enDusuk: litre.length ? Math.min(...litre) : null };
+}
+function refSatiri(p) {
+  const aralik = (a, b, pr) => para(a, pr) + (b != null ? "–" + para(b, pr) : "");
+  const fiyat = (p.para !== "EUR" ? aralik(p.fiyat_alt, p.fiyat_ust, p.para) + " · " : "") + aralik(p.eur_alt, p.eur_ust, "EUR");
+  const ad = esc(L === "tr" ? p.pazar : p.pazar_en) + " · " + tarih(p.tarih);
+  return `<div class="ref"><span>${p.kaynak ? `<a href="${esc(p.kaynak)}" rel="noopener">${ad}</a>` : ad}</span><span>${fiyat}</span></div>`;
+}
+function pazarBlogu(k, ulke, df, haricYerler) {
+  if (!ulke) return "";
+  const y = yerelPazar(k, ulke, haricYerler);
+  if (!y.ref.length && !y.sehir.length) return "";
+  let hukum = "";
+  if (df && df.eur_litre != null && y.enDusuk != null) {
+    const f = (df.eur_litre - y.enDusuk) / y.enDusuk * 100;
+    hukum = Math.abs(f) < 2 ? `<div class="hukum esit">${kod(df.yer_kod)} ${esc(t("lSame"))}</div>`
+      : `<div class="hukum ${f < 0 ? "ucuz" : "pahali"}">${kod(df.yer_kod)} ${esc(t(f < 0 ? "lBelow" : "lAbove", { p: Math.abs(f).toFixed(0) }))}</div>`;
+  }
+  return `<div class="pazar"><div class="ad">${esc(t("localMarket", { c: ULKE[L][ulke] || ulke }))}</div>${y.ref.map(refSatiri).join("")}${y.sehir.map(g => satir(g)).join("")}${hukum}</div>`;
+}
+function gruplar(yerKod) {
   const m = new Map();
-  for (const g of G) {
-    if (g.yer_kod !== yerKod || g.fiyat == null) continue;
-    const k = anahtar(g) + "|" + (g.hacim_ml || "");
-    if (!m.has(k) || m.get(k).tarih < g.tarih) m.set(k, g);
-  }
-  return [...m.values()];
+  if (yerKod) for (const g of G) if (g.yer_kod === yerKod) (m.get(anahtar(g)) || m.set(anahtar(g), []).get(anahtar(g))).push(g);
+  for (const l of m.values()) l.sort(yeniden);
+  return m;
 }
-function eslestir(a, b) {
-  const cift = [];
-  const bGrup = new Map();
-  for (const g of sonGozlemler(b)) (bGrup.get(anahtar(g)) || bGrup.set(anahtar(g), []).get(anahtar(g))).push(g);
-  const aGrup = new Map();
-  for (const g of sonGozlemler(a)) (aGrup.get(anahtar(g)) || aGrup.set(anahtar(g), []).get(anahtar(g))).push(g);
-  for (const [k, al] of aGrup) {
-    const bl = bGrup.get(k);
-    if (!bl) continue;
-    let bulundu = false;
-    for (const x of al) for (const y of bl) if (x.hacim_ml && x.hacim_ml === y.hacim_ml) { cift.push({ x, y, olcu: "sise" }); bulundu = true; }
-    if (bulundu) continue;
-    const x = al.sort((p, q) => q.tarih.localeCompare(p.tarih))[0], y = bl.sort((p, q) => q.tarih.localeCompare(p.tarih))[0];
-    cift.push({ x, y, olcu: x.hacim_ml && y.hacim_ml ? "litre" : "belirsiz" });
-  }
-  return cift;
-}
-function yanKart(g, olcu) {
-  const litre = olcu === "litre" && g.eur_litre != null ? ` · litresi ${para(g.eur_litre, "EUR")}` : "";
-  const ind = g.indirim_yuzde ? ` · %${Math.round(g.indirim_yuzde)} indirimli` : "";
-  return `<div class="yan"><div>${kod(g.yer_kod)}</div><div class="fiyat">${para(g.fiyat_eur, "EUR")}</div>
-    <div class="alt">${g.para !== "EUR" ? para(g.fiyat, g.para) + " · " : ""}${hacim(g.hacim_ml)}${litre}${ind}</div>
-    <div class="alt">${tarih(g.tarih)}${g.guven === "kısmi" ? ' · <span class="kismi">kısmi okuma</span>' : ""}</div></div>`;
+// İki taraftaki en yeni fiyatlardan kıyaslanacak çifti seç: önce aynı şişe boyu, yoksa litre fiyatı
+function cift(al, bl) {
+  const a = al.filter(g => g.fiyat_eur != null), b = bl.filter(g => g.fiyat_eur != null);
+  if (!a.length || !b.length) return null;
+  for (const x of a) { const y = b.find(z => z.hacim_ml && z.hacim_ml === x.hacim_ml); if (y) return { x, y, fa: x.fiyat_eur, fb: y.fiyat_eur, olcu: "sise" }; }
+  const x = a[0], y = b[0];
+  return x.eur_litre != null && y.eur_litre != null ? { x, y, fa: x.eur_litre, fb: y.eur_litre, olcu: "litre" } : { x, y, fa: x.fiyat_eur, fb: y.fiyat_eur, olcu: "belirsiz" };
 }
 function rotaCiz() {
   const a = $("kalkis").value, b = $("varis").value;
-  const cift = a === b ? [] : eslestir(a, b);
-  if (!cift.length) { $("rota").innerHTML = `<div class="bos">${a === b ? "Kalkış ve varış aynı." : "Bu iki yerde ortak gördüğüm ürün yok. Fotoğraf ekledikçe dolacak."}</div>`; return; }
-  $("rota").innerHTML = cift.map(({ x, y, olcu }) => {
-    const fa = olcu === "litre" ? x.eur_litre : x.fiyat_eur, fb = olcu === "litre" ? y.eur_litre : y.fiyat_eur;
-    const fark = (fb - fa) / fa * 100, yil = Math.abs(new Date(x.tarih) - new Date(y.tarih)) / 864e5 / 365;
-    let h, s;
-    if (Math.abs(fark) < 2) { h = "esit"; s = "Fiyat neredeyse aynı"; }
-    else if (fark < 0) { h = "pahali"; s = `Varışta %${Math.abs(fark).toFixed(0)} ucuz — kalkışta alma`; }
-    else { h = "ucuz"; s = `Kalkışta %${(fark / (100 + fark) * 100).toFixed(0)} ucuz — kalkışta al`; }
-    const uyari = [olcu === "litre" ? "şişe boyları farklı, litre fiyatı kıyaslandı" : "", olcu === "belirsiz" ? "bir tarafta hacim okunamadı" : "",
-      yil >= 1 ? `iki fiyat arasında ${yil.toFixed(1).replace(".", ",")} yıl var` : ""].filter(Boolean).join(" · ");
-    return `<div class="kart"><div class="urun">${esc(taban(x))}</div><div class="iki">${yanKart(x, olcu)}${yanKart(y, olcu)}</div>
-      <div class="hukum ${h}">${s}</div>${uyari ? `<div class="alt">${uyari}</div>` : ""}</div>`;
-  }).join("");
+  if (!a && !b) { $("rota").innerHTML = `<div class="bos">${esc(t("pickHint"))}</div>`; return; }
+  if (a === b) { $("rota").innerHTML = `<div class="bos">${esc(t("same"))}</div>`; return; }
+  const A = gruplar(a), B = gruplar(b), ua = a && YER[a].ulke, ub = b && YER[b].ulke, haric = [a, b].filter(Boolean);
+  const ortak = [...A.keys()].filter(k => B.has(k)), yalnizA = [...A.keys()].filter(k => !B.has(k)), yalnizB = [...B.keys()].filter(k => !A.has(k));
+  const ada = (m, k) => urunAdi(m.get(k)[0]), sirala = (m, l) => l.sort((p, q) => ada(m, p).localeCompare(ada(m, q), YEREL[L]));
+  let h = "";
+  if (ortak.length) {
+    h += `<h3>${esc(t("gBoth", { n: ortak.length }))}</h3>` + sirala(A, ortak).map(k => {
+      const al = A.get(k), bl = B.get(k), c = cift(al, bl);
+      let hukum = "", uyari = "";
+      if (c) {
+        const fark = (c.fb - c.fa) / c.fa * 100, yil = Math.abs(new Date(c.x.tarih) - new Date(c.y.tarih)) / 864e5 / 365;
+        hukum = Math.abs(fark) < 2 ? `<div class="hukum esit">${esc(t("vSame"))}</div>`
+          : fark < 0 ? `<div class="hukum pahali">${esc(t("vTo", { p: Math.abs(fark).toFixed(0) }))}</div>`
+          : `<div class="hukum ucuz">${esc(t("vFrom", { p: (fark / (100 + fark) * 100).toFixed(0) }))}</div>`;
+        uyari = [t("latest"), c.olcu === "litre" ? t("wLitre") : "", c.olcu === "belirsiz" ? t("wSize") : "", yil >= 1 ? t("wYears", { y: yil.toLocaleString(YEREL[L], { maximumFractionDigits: 1 }) }) : ""].filter(Boolean).join(" · ");
+      }
+      const pazar = pazarBlogu(k, ua, al.find(g => g.eur_litre != null), haric) + (ub !== ua ? pazarBlogu(k, ub, bl.find(g => g.eur_litre != null), haric) : "");
+      return `<div class="kart"><div class="urun">${esc(urunAdi(al[0]))}</div><div class="iki"><div class="yan">${al.map(g => satir(g, c && g === c.x)).join("")}</div><div class="yan">${bl.map(g => satir(g, c && g === c.y)).join("")}</div></div>
+        ${hukum}${uyari ? `<div class="alt">${esc(uyari)}</div>` : ""}${pazar}</div>`;
+    }).join("");
+  }
+  const tek = (m, l, yer, ulke) => l.length ? `<h3>${esc(t("gOnly", { x: yerAdi(YER[yer]), n: l.length }))}</h3>` + sirala(m, l).map(k => {
+    const ol = m.get(k);
+    return `<div class="kart"><div class="urun">${esc(urunAdi(ol[0]))}</div><div>${ol.map(g => satir(g)).join("")}</div>${pazarBlogu(k, ulke, ol.find(g => g.eur_litre != null), haric)}</div>`;
+  }).join("") : "";
+  h += tek(A, yalnizA, a, ua) + tek(B, yalnizB, b, ub);
+  $("rota").innerHTML = h || `<div class="bos">${esc(t("nothing"))}</div>`;
 }
-function defterCiz() {
-  const q = $("ara").value.trim().toLocaleLowerCase("tr"), kat = $("kat").value, yer = $("yer").value;
-  const grup = new Map();
+function urunCiz() {
+  const soz = $("ara").value.toLocaleLowerCase(YEREL[L]).split(/\s+/).filter(Boolean), kat = $("kat").value, m = new Map();
   for (const g of G) {
     if (kat && g.kategori !== kat) continue;
-    if (q && !(g.marka + " " + g.urun + " " + g.kategori).toLocaleLowerCase("tr").includes(q)) continue;
-    (grup.get(anahtar(g)) || grup.set(anahtar(g), []).get(anahtar(g))).push(g);
+    const metin = (g.marka + " " + g.urun + " " + g.urun_en + " " + (KAT[L][g.kategori] || "") + " " + g.kategori).toLocaleLowerCase(YEREL[L]);
+    if (!soz.every(s => metin.includes(s))) continue;
+    (m.get(anahtar(g)) || m.set(anahtar(g), []).get(anahtar(g))).push(g);
   }
-  let gruplar = [...grup.values()];
-  if (yer) gruplar = gruplar.filter(l => l.some(g => g.yer_kod === yer));
-  gruplar.sort((p, q2) => taban(p[0]).localeCompare(taban(q2[0]), "tr"));
-  $("defter-ozet").textContent = `${gruplar.length} ürün · ${gruplar.reduce((n, l) => n + l.length, 0)} fiyat`;
-  $("defter").innerHTML = gruplar.map(l => {
-    l.sort((p, q2) => q2.tarih.localeCompare(p.tarih) || p.yer_kod.localeCompare(q2.yer_kod));
-    const litreli = l.filter(g => g.eur_litre != null), enUcuz = litreli.length > 1 ? litreli.reduce((m, g) => g.eur_litre < m.eur_litre ? g : m) : null;
-    return `<div class="kart"><div class="urun">${esc(taban(l[0]))} <small>${esc(l[0].kategori)}</small></div><div>` + l.map(g => {
-      const ek = [g.urun.match(/\(([^)]*)\)/)?.[1], g.liste_fiyat ? `liste ${para(g.liste_fiyat, g.para)}` : "", g.fiyat_ab_ici ? `AB içi varış ${para(g.fiyat_ab_ici, g.para)}` : "",
-        g.coklu_teklif, g.kaynak && g.kaynak.includes("fiş") ? "fişle doğrulandı" : "", g.guven === "kısmi" ? `<span class="kismi">kısmi: ${esc(g.not)}</span>` : ""].filter(Boolean)
-        .map((s, i) => i < 5 && !String(s).startsWith("<span") ? esc(s) : s).join(" · ");
-      return `<div class="satir${g === enUcuz ? " enucuz" : ""}">${kod(g.yer_kod)}<div>${tarih(g.tarih)} · ${hacim(g.hacim_ml)} ${g.indirim_yuzde ? `<span class="rozet">−%${Math.round(g.indirim_yuzde)}</span>` : ""}</div>
-        <div class="f">${g.fiyat == null ? "—" : para(g.fiyat, g.para)}${g.para !== "EUR" && g.fiyat_eur != null ? `<br><span class="alt">${para(g.fiyat_eur, "EUR")}</span>` : ""}</div>${ek ? `<div class="a">${ek}</div>` : ""}</div>`;
-    }).join("") + `</div></div>`;
-  }).join("") || `<div class="bos">Eşleşen kayıt yok.</div>`;
+  const gr = [...m.entries()].sort((p, q) => urunAdi(p[1][0]).localeCompare(urunAdi(q[1][0]), YEREL[L]));
+  $("urun-ozet").textContent = t("summary", { a: gr.length, b: gr.reduce((n, e) => n + e[1].length, 0) });
+  $("urunliste").innerHTML = gr.map(([k, l]) => {
+    l.sort((p, q) => p.yer_kod.localeCompare(q.yer_kod) || yeniden(p, q));
+    const lt = l.filter(g => g.eur_litre != null), enUcuz = lt.length > 1 ? lt.reduce((x, g) => g.eur_litre < x.eur_litre ? g : x) : null;
+    const ref = V.piyasa.filter(p => pAnahtar(p) === k);
+    return `<div class="kart"><div class="urun">${esc(urunAdi(l[0]))} <small>${esc(KAT[L][l[0].kategori] || l[0].kategori)}</small></div><div>${l.map(g => satir(g, g === enUcuz)).join("")}</div>
+      ${ref.length ? `<div class="pazar"><div class="ad">${esc(t("refs"))}</div>${ref.map(refSatiri).join("")}</div>` : ""}</div>`;
+  }).join("") || `<div class="bos">${esc(t("noMatch"))}</div>`;
+}
+function durum(k, v) { sonDurum = k ? [k, v] : null; $("durum").textContent = k ? t(k, v) : ""; }
+function yerBul(q) {
+  const s = q.toLocaleLowerCase("en").split(/\s+/).filter(Boolean);
+  const uyan = V.yerler.filter(y => G.some(g => g.yer_kod === y.kod)).filter(y => s.every(x => (y.kod + " " + y.ad + " " + y.ad_en + " " + (y.arama || "")).toLocaleLowerCase("en").includes(x)));
+  return uyan.find(y => y.kod.toLowerCase() === q.toLowerCase()) || uyan.find(y => y.tur === "duty-free") || uyan[0] || null;
+}
+async function ucusAra(e) {
+  e.preventDefault();
+  const q = $("ucus").value.trim();
+  if (!q) return;
+  const ucus = q.toUpperCase().replace(/[\s-]+/g, "");
+  if (/^([A-Z]{2,3}|[A-Z]\d|\d[A-Z])\d{1,4}[A-Z]?$/.test(ucus)) {
+    durum("looking");
+    try {
+      const r = await fetch("https://api.adsbdb.com/v0/callsign/" + encodeURIComponent(ucus)), fr = (await r.json())?.response?.flightroute;
+      if (!fr) return durum("flightNotFound", { code: ucus });
+      const o = fr.origin.iata_code, h = fr.destination.iata_code, bilinen = k => YER[k] && G.some(g => g.yer_kod === k);
+      $("kalkis").value = bilinen(o) ? o : ""; $("varis").value = bilinen(h) ? h : "";
+      rotaCiz();
+      const eksik = [[o, fr.origin], [h, fr.destination]].filter(([k]) => !bilinen(k)).map(([k, y]) => `${y.municipality || y.name} (${k})`);
+      durum("flightFound", { code: ucus, a: o, b: h });
+      if (eksik.length) $("durum").textContent += " " + eksik.map(x => t("noData", { x })).join(" ");
+    } catch { durum("lookupFailed"); }
+    return;
+  }
+  const y = yerBul(q);
+  if (!y) return durum("noData", { x: q });
+  $("varis").value = y.kod; rotaCiz(); durum("destSet", { x: `${yerAdi(y)} (${y.kod.replace("TYO-", "")})` });
+}
+function dilUygula(d) {
+  L = T[d] ? d : "en";
+  document.documentElement.lang = L;
+  try { localStorage.setItem("dfm-dil", L); } catch {}
+  for (const b of document.querySelectorAll("[data-dil]")) b.setAttribute("aria-pressed", String(b.dataset.dil === L));
+  for (const e of document.querySelectorAll("[data-t]")) e.textContent = t(e.dataset.t);
+  for (const e of document.querySelectorAll("[data-tp]")) e.placeholder = t(e.dataset.tp);
+  for (const e of document.querySelectorAll("[data-ta]")) e.setAttribute("aria-label", t(e.dataset.ta));
+  const tarihler = G.map(g => g.tarih).sort(), yerler = V.yerler.filter(y => G.some(g => g.yer_kod === y.kod));
+  $("sayilar").innerHTML = [t("sPrices", { n: `<b>${G.length}</b>` }), t("sAirports", { n: `<b>${yerler.filter(y => y.tur === "duty-free").length}</b>` }),
+    `<b>${tarih(tarihler[0])}</b> – <b>${tarih(tarihler.at(-1))}</b>`, t("sUpdated", { d: `<b>${tarih(V.uretim)}</b>` })].map(s => `<span>${s}</span>`).join("");
+  const secenek = y => `<option value="${y.kod}">${esc(y.kod.replace("TYO-", ""))} — ${esc(yerAdi(y))}</option>`;
+  for (const id of ["kalkis", "varis"]) { const v = $(id).value; $(id).innerHTML = `<option value="">${esc(t("none"))}</option>` + yerler.map(secenek).join(""); $(id).value = v; }
+  const k = $("kat").value;
+  $("kat").innerHTML = `<option value="">${esc(t("all"))}</option>` + [...new Set(G.map(g => g.kategori))].map(c => [c, KAT[L][c] || c]).sort((p, q) => p[1].localeCompare(q[1], YEREL[L])).map(([c, ad]) => `<option value="${esc(c)}">${esc(ad)}</option>`).join("");
+  $("kat").value = k;
+  $("urunler").innerHTML = [...new Set(G.map(urunAdi))].sort((p, q) => p.localeCompare(q, YEREL[L])).map(u => `<option value="${esc(u)}">`).join("");
+  if (sonDurum) $("durum").textContent = t(...sonDurum);
+  rotaCiz(); urunCiz();
 }
 function kur() {
-  const tarihler = G.map(g => g.tarih).sort(), dfYer = V.yerler.filter(y => y.tur === "duty-free" && G.some(g => g.yer_kod === y.kod));
-  $("sayilar").innerHTML = `<span><b>${G.length}</b> fiyat</span><span><b>${dfYer.length}</b> havalimanı</span><span><b>${tarih(tarihler[0])}</b> – <b>${tarih(tarihler.at(-1))}</b></span><span>güncelleme <b>${tarih(V.uretim)}</b></span>`;
-  const secenek = y => `<option value="${y.kod}">${esc(y.kod.replace("TYO-", ""))} — ${esc(y.ad)}</option>`;
-  const yerler = V.yerler.filter(y => G.some(g => g.yer_kod === y.kod));
-  $("kalkis").innerHTML = $("varis").innerHTML = yerler.map(secenek).join("");
-  $("yer").innerHTML = `<option value="">Hepsi</option>` + yerler.map(secenek).join("");
-  $("kat").innerHTML = `<option value="">Hepsi</option>` + [...new Set(G.map(g => g.kategori))].sort((a, b) => a.localeCompare(b, "tr")).map(k => `<option>${esc(k)}</option>`).join("");
+  let d = "en";
+  try { d = localStorage.getItem("dfm-dil") || "en"; } catch {}
+  dilUygula(d);
   // Açılışta en çok ortak ürünü olan havalimanı çifti
-  let en = [yerler[0].kod, yerler[1].kod, -1];
-  for (const a of dfYer) for (const b of dfYer) if (a.kod < b.kod) { const n = eslestir(a.kod, b.kod).length; if (n > en[2]) en = [a.kod, b.kod, n]; }
+  const df = V.yerler.filter(y => y.tur === "duty-free" && G.some(g => g.yer_kod === y.kod));
+  let en = ["", "", -1];
+  for (const a of df) for (const b of df) if (a.kod < b.kod) { const B = gruplar(b.kod), n = [...gruplar(a.kod).keys()].filter(k => B.has(k)).length; if (n > en[2]) en = [a.kod, b.kod, n]; }
   $("kalkis").value = en[0]; $("varis").value = en[1];
-  $("piyasa-baslik").textContent = `Mağaza dışı fiyatlar (${V.piyasa.length} kayıt)`;
-  $("piyasa").innerHTML = `<tr><th>Ürün</th><th>Pazar</th><th>Fiyat</th><th>Tarih</th></tr>` + V.piyasa.map(p =>
-    `<tr><td>${esc(p.urun)}${p.not ? `<br><span class="alt">${esc(p.not)}</span>` : ""}</td><td>${esc(p.pazar)}</td>
-     <td class="r">${para(p.fiyat_alt, p.para)}${p.fiyat_ust != null ? " – " + para(p.fiyat_ust, p.para) : ""}</td>
-     <td class="r">${p.kaynak ? `<a href="${esc(p.kaynak.split(" ; ")[0])}" rel="noopener">${tarih(p.tarih)}</a>` : tarih(p.tarih)}</td></tr>`).join("");
-  $("dip").textContent = "Avro karşılıkları fotoğrafın çekildiği günün ECB kuruyla hesaplandı. “Kısmi okuma” etiketin kesik, örtülü ya da düşük çözünürlüklü olduğu satırlardır. Kişisel kayıt; fiyatlar çekildiği günün raf fiyatıdır, bugün farklı olabilir.";
-  for (const id of ["kalkis", "varis"]) $(id).addEventListener("change", rotaCiz);
+  for (const b of document.querySelectorAll("[data-dil]")) b.addEventListener("click", () => dilUygula(b.dataset.dil));
+  for (const id of ["kalkis", "varis"]) $(id).addEventListener("change", () => { durum(null); rotaCiz(); });
   $("cevir").addEventListener("click", () => { const k = $("kalkis").value; $("kalkis").value = $("varis").value; $("varis").value = k; rotaCiz(); });
-  for (const id of ["ara", "kat", "yer"]) $(id).addEventListener("input", defterCiz);
-  rotaCiz(); defterCiz();
+  $("ucus-form").addEventListener("submit", ucusAra);
+  for (const id of ["ara", "kat"]) $(id).addEventListener("input", urunCiz);
+  rotaCiz();
 }
 kur();
 </script>

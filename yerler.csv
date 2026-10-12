@@ -1,12 +1,12 @@
-kod,ad,ulke,tur,magaza,lat,lon
-IST,İstanbul Havalimanı,TR,duty-free,,41.2667,28.7488
-SAW,İstanbul Sabiha Gökçen Havalimanı,TR,duty-free,Duty Free Store (etiket logosu),40.9076,29.3158
-ECN,Ercan Havalimanı,KKTC,duty-free,Kaner Duty Free,35.1484,33.5039
-CRL,Brüksel Güney Charleroi Havalimanı,BE,duty-free,,50.4696,4.4702
-FCO,Roma Fiumicino Havalimanı,IT,duty-free,,41.7965,12.2508
-CPH,Kopenhag Havalimanı,DK,duty-free,Heinemann Tax Free,55.6287,12.6471
-ARN,Stockholm Arlanda Havalimanı,SE,duty-free,,59.6508,17.9282
-STR,Stuttgart Havalimanı,DE,duty-free,,48.6896,9.1948
-HND,Tokyo Haneda Havalimanı,JP,duty-free,,35.5481,139.7911
-TYO-GNZ1,Tokyo Ginza — içki mağazası (adı fotoğrafta yok),JP,şehir mağazası,,35.6739,139.7652
-TYO-GNZ2,Tokyo Ginza — koleksiyon viski mağazası (adı fotoğrafta yok),JP,şehir mağazası,,35.6713,139.7606
+kod,ad,ad_en,ulke,tur,magaza,lat,lon,arama
+IST,İstanbul Havalimanı,Istanbul Airport,TR,duty-free,,41.2667,28.7488,istanbul
+SAW,İstanbul Sabiha Gökçen Havalimanı,Istanbul Sabiha Gökçen Airport,TR,duty-free,Duty Free Store (etiket logosu),40.9076,29.3158,istanbul sabiha gokcen
+ECN,Ercan Havalimanı,Ercan Airport,KKTC,duty-free,Kaner Duty Free,35.1484,33.5039,ercan nicosia lefkosa north cyprus kibris
+CRL,Brüksel Güney Charleroi Havalimanı,Brussels South Charleroi Airport,BE,duty-free,,50.4696,4.4702,brussels bruxelles charleroi
+FCO,Roma Fiumicino Havalimanı,Rome Fiumicino Airport,IT,duty-free,,41.7965,12.2508,rome roma fiumicino
+CPH,Kopenhag Havalimanı,Copenhagen Airport,DK,duty-free,Heinemann Tax Free,55.6287,12.6471,copenhagen kopenhag kobenhavn
+ARN,Stockholm Arlanda Havalimanı,Stockholm Arlanda Airport,SE,duty-free,,59.6508,17.9282,stockholm arlanda
+STR,Stuttgart Havalimanı,Stuttgart Airport,DE,duty-free,,48.6896,9.1948,stuttgart
+HND,Tokyo Haneda Havalimanı,Tokyo Haneda Airport,JP,duty-free,,35.5481,139.7911,tokyo haneda
+TYO-GNZ1,Tokyo Ginza — içki mağazası (adı fotoğrafta yok),Tokyo Ginza — liquor store,JP,şehir mağazası,,35.6739,139.7652,tokyo ginza
+TYO-GNZ2,Tokyo Ginza — koleksiyon viski mağazası (adı fotoğrafta yok),Tokyo Ginza — collectors' whisky shop,JP,şehir mağazası,,35.6713,139.7606,tokyo ginza
