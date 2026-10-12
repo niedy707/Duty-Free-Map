@@ -2,7 +2,7 @@
 // Fotoğraf yayımlanmaz; özel depoda "bekleyen/" altına düşer ve elle incelendikten sonra veriye işlenir.
 import { randomBytes } from "node:crypto";
 import { put } from "@vercel/blob";
-import { BOYUT_SINIRI, KUYRUK_SINIRI, durumOku, durumYaz, yanit } from "./_ortak.js";
+import { BOYUT_SINIRI, GUNLUK_SINIR, KUYRUK_SINIRI, durumOku, durumYaz, sayacOku, sayacYaz, sayacYolu, yanit } from "./_ortak.js";
 
 const temiz = (s, enCok) => String(s ?? "").replace(/[\u0000-\u001f\u007f<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, enCok);
 
@@ -32,6 +32,9 @@ export default async function handler(req, res) {
   const gun = /^\d{4}-\d{2}-\d{2}$/.test(tarih) ? Date.parse(tarih + "T00:00:00Z") : NaN;
   if (yer.length < 2 || Number.isNaN(gun) || gun < Date.parse("2015-01-01") || gun > Date.now() + 2 * 864e5) return yanit(res, 400, { hata: "fields" });
 
+  const sayac = sayacYolu(req), bugun = await sayacOku(sayac);
+  if (bugun >= GUNLUK_SINIR) return yanit(res, 429, { hata: "rate" });
+
   const govde = await govdeOku(req);
   if (!govde) return yanit(res, 413, { hata: "size" });
   if (govde.length < 2000 || govde[0] !== 0xff || govde[1] !== 0xd8 || govde[2] !== 0xff) return yanit(res, 415, { hata: "type" });
@@ -44,5 +47,6 @@ export default async function handler(req, res) {
   await put(`bekleyen/${ad}.jpg`, govde, { ...secenek, contentType: "image/jpeg" });
   await put(`bekleyen/${ad}.json`, JSON.stringify({ yer, tarih, not, alindi: new Date().toISOString(), bayt: govde.length }), { ...secenek, contentType: "application/json" });
   await durumYaz(durum.bekleyen + 1);
+  await sayacYaz(sayac, bugun + 1);
   return yanit(res, 200, { tamam: true });
 }

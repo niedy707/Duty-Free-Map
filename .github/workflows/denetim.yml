@@ -1,0 +1,23 @@
+# Her gönderimde ve çekme isteğinde veriyi denetler: CSV'ler tutarlı mı, her ürün kimliği tanımlı mı,
+# sayfaya çevrilmemiş Türkçe açıklama sızıyor mu. Yayın bu iş akışıyla yapılmaz.
+name: Veri denetimi
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  denetim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Veritabanını kur (CSV tutarlılığı)
+        run: python3 db_kur.py
+      - name: Sayfayı üret (çeviri ve ürün kimliği denetimi)
+        run: python3 sayfa_kur.py
+      - name: İşlev sözdizimi
+        run: for f in site/api/*.js; do node --check "$f"; done

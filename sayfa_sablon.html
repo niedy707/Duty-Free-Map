@@ -66,6 +66,10 @@ select:focus-visible, input:focus-visible, button:focus-visible, summary:focus-v
 .rozet { font: 500 11px var(--rakam); padding: 1px 5px; border-radius: 3px; background: var(--ucuz-zemin); color: var(--ucuz); white-space: nowrap; }
 .kismi { color: var(--pahali); }
 .enucuz .f { color: var(--ucuz); }
+.eski { opacity: .62; }
+.rozet.gri { background: var(--zemin); color: var(--soluk); }
+.rozet.df { background: var(--tabela); color: var(--tabela-yazi); }
+.bilgi { display: grid; gap: 6px; font-size: 13px; padding: 10px 12px; border: 1px solid var(--cizgi); border-radius: 8px; background: var(--kagit); overflow-wrap: anywhere; }
 .pazar { display: grid; gap: 4px; border-top: 1px dashed var(--cizgi); padding-top: 8px; font-size: 13px; }
 .pazar .ad { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--soluk); }
 .pazar .ref { display: flex; flex-wrap: wrap; gap: 2px 10px; justify-content: space-between; }
@@ -108,6 +112,12 @@ a { color: inherit; }
     <div class="liste" id="rota"></div>
   </section>
 
+  <section class="bolum" id="endeks-bolum" aria-labelledby="b-endeks" hidden>
+    <h2 id="b-endeks" data-t="hIndex"></h2>
+    <p class="alt" data-t="indexIntro"></p>
+    <div class="liste" id="endeks"></div>
+  </section>
+
   <section class="bolum" aria-labelledby="b-urun">
     <h2 id="b-urun" data-t="hProducts"></h2>
     <div class="denetim">
@@ -139,6 +149,7 @@ a { color: inherit; }
   </section>
 
   <p class="dip" data-t="foot"></p>
+  <p class="dip"><span data-t="lic"></span> <a href="https://github.com/niedy707/Duty-Free-Map" rel="noopener">GitHub</a></p>
 </div>
 
 <script id="veri" type="application/json">/*VERI*/</script>
@@ -161,7 +172,7 @@ const ULKE = {
 const T = {
 en: { tagline: "Liquor prices read from duty-free shelf tags. Enter your flight or pick two airports to see where each bottle is cheaper.",
   sPrices: "{n} prices", sAirports: "{n} airports", sUpdated: "updated {d}", hRoute: "Your route", flightLabel: "Flight number or destination", flightPh: "TK199, Tokyo, IST…", find: "Find",
-  from: "From", to: "To", swap: "Swap from and to", none: "— not selected —", looking: "Looking up the flight…", flightFound: "{code}: {a} → {b}.", noData: "No prices recorded for {x} yet.",
+  from: "From", to: "To", swap: "Swap from and to", none: "— not selected —", looking: "Looking up the flight…", flightFound: "{code}: {a} → {b}. Flight data can be out of date — check the airports.", noData: "No prices recorded for {x} yet.",
   flightNotFound: "Couldn't find flight {code}. Pick the airports below.", lookupFailed: "Flight lookup isn't available right now. Pick the airports below.", destSet: "Destination set to {x}.",
   pickHint: "Pick a departure or arrival airport.", same: "Departure and arrival are the same.", gBoth: "At both ({n})", gOnly: "Only seen at {x} ({n})",
   nothing: "No prices recorded on this route yet. They'll appear as photos are added.", vSame: "About the same price", vTo: "{p}% cheaper at arrival — don't buy at departure", vFrom: "{p}% cheaper at departure — buy before you fly",
@@ -169,6 +180,8 @@ en: { tagline: "Liquor prices read from duty-free shelf tags. Enter your flight 
   localMarket: "Local market in {c}", lBelow: "{p}% below the local market", lAbove: "{p}% above the local market", lSame: "about the same as the local market",
   perLitre: "{x} per litre", list: "list {x}", euDest: "EU destination {x}", receipt: "confirmed by receipt", partial: "partial reading", sizeUnknown: "size ?", tryApprox: "≈ {x} TRY",
   hProducts: "One product, every location", searchLabel: "Product or brand", searchPh: "chivas 18, macallan, rakı…", type: "Type", all: "All", summary: "{a} products · {b} prices", noMatch: "No matching records.", refs: "Market references",
+  old: "old", wOld: "one of the prices is over a year old", tre: "duty-free only", dep: "departures shop", arr: "arrivals shop", hIndex: "Reference bottles", indexIntro: "Bottles seen at three or more airports, cheapest per litre first.", catalog: "Check today's prices in the official shop:", allowance: "Bringing alcohol into {c}:", allowanceSrc: "official source, read {d}", eRate: "too many uploads from this connection today, please try again tomorrow",
+  lic: "Data: CC BY 4.0 · code: MIT · airport list from OurAirports (public domain) · exchange rates: European Central Bank.",
   hAdd: "The data grows with you", add1: "The data on this site grows thanks to its users. The more up-to-date photos you and others add, the more people benefit.",
   add2a: "The full data set is on ", add2b: ".",
   upIntro: "Upload a photo of a duty-free shelf tag. We read the prices and add them after review; the photo itself is never published.",
@@ -180,7 +193,7 @@ en: { tagline: "Liquor prices read from duty-free shelf tags. Enter your flight 
   foot: "EUR and TRY equivalents use the ECB rate on the day the price was seen. “Partial reading” marks tags that were cut off, covered or low-resolution. These are shelf prices on the day they were seen and may have changed. This site does not sell or promote anything." },
 de: { tagline: "Spirituosenpreise, direkt von Duty-free-Regaletiketten abgelesen. Flugnummer eingeben oder zwei Flughäfen wählen und sehen, wo jede Flasche günstiger ist.",
   sPrices: "{n} Preise", sAirports: "{n} Flughäfen", sUpdated: "aktualisiert {d}", hRoute: "Deine Route", flightLabel: "Flugnummer oder Ziel", flightPh: "TK199, Tokyo, IST…", find: "Suchen",
-  from: "Von", to: "Nach", swap: "Von und Nach tauschen", none: "— nicht gewählt —", looking: "Flug wird gesucht…", flightFound: "{code}: {a} → {b}.", noData: "Für {x} sind noch keine Preise erfasst.",
+  from: "Von", to: "Nach", swap: "Von und Nach tauschen", none: "— nicht gewählt —", looking: "Flug wird gesucht…", flightFound: "{code}: {a} → {b}. Flugdaten können veraltet sein — prüfe die Flughäfen.", noData: "Für {x} sind noch keine Preise erfasst.",
   flightNotFound: "Flug {code} nicht gefunden. Wähle die Flughäfen unten.", lookupFailed: "Die Flugsuche ist gerade nicht verfügbar. Wähle die Flughäfen unten.", destSet: "Ziel: {x}.",
   pickHint: "Wähle einen Abflug- oder Zielflughafen.", same: "Abflug und Ziel sind identisch.", gBoth: "An beiden ({n})", gOnly: "Nur in {x} gesehen ({n})",
   nothing: "Für diese Route sind noch keine Preise erfasst. Sie erscheinen, sobald Fotos hinzukommen.", vSame: "Etwa gleicher Preis", vTo: "Am Ziel {p}% günstiger — nicht beim Abflug kaufen", vFrom: "Beim Abflug {p}% günstiger — vor dem Flug kaufen",
@@ -188,6 +201,8 @@ de: { tagline: "Spirituosenpreise, direkt von Duty-free-Regaletiketten abgelesen
   localMarket: "Lokaler Markt in {c}", lBelow: "{p}% unter dem lokalen Markt", lAbove: "{p}% über dem lokalen Markt", lSame: "etwa wie der lokale Markt",
   perLitre: "{x} pro Liter", list: "Liste {x}", euDest: "EU-Ziel {x}", receipt: "per Kassenbon bestätigt", partial: "teilweise gelesen", sizeUnknown: "Größe ?", tryApprox: "≈ {x} TRY",
   hProducts: "Ein Produkt, alle Orte", searchLabel: "Produkt oder Marke", searchPh: "chivas 18, macallan, rakı…", type: "Art", all: "Alle", summary: "{a} Produkte · {b} Preise", noMatch: "Keine passenden Einträge.", refs: "Marktreferenzen",
+  old: "alt", wOld: "einer der Preise ist über ein Jahr alt", tre: "nur Duty-free", dep: "Abflug-Shop", arr: "Ankunfts-Shop", hIndex: "Referenzflaschen", indexIntro: "Flaschen, die an mindestens drei Flughäfen gesehen wurden; günstigster Literpreis zuerst.", catalog: "Heutige Preise im offiziellen Shop prüfen:", allowance: "Alkohol-Freimenge bei Einreise nach {c}:", allowanceSrc: "offizielle Quelle, gelesen am {d}", eRate: "heute zu viele Uploads von diesem Anschluss, bitte morgen erneut versuchen",
+  lic: "Daten: CC BY 4.0 · Code: MIT · Flughafenliste von OurAirports (gemeinfrei) · Wechselkurse: Europäische Zentralbank.",
   hAdd: "Die Daten wachsen mit euch", add1: "Die Daten auf dieser Seite wachsen dank ihrer Nutzer. Je mehr aktuelle Fotos du und andere hinzufügen, desto mehr Menschen profitieren.",
   add2a: "Der gesamte Datensatz liegt auf ", add2b: ".",
   upIntro: "Lade ein Foto eines Duty-free-Regaletiketts hoch. Wir lesen die Preise ab und fügen sie nach Prüfung hinzu; das Foto selbst wird nie veröffentlicht.",
@@ -199,7 +214,7 @@ de: { tagline: "Spirituosenpreise, direkt von Duty-free-Regaletiketten abgelesen
   foot: "EUR- und TRY-Werte nutzen den EZB-Kurs des Tages, an dem der Preis gesehen wurde. „Teilweise gelesen“ markiert Etiketten, die abgeschnitten, verdeckt oder unscharf waren. Es sind Regalpreise vom jeweiligen Tag; sie können sich geändert haben. Diese Seite verkauft und bewirbt nichts." },
 es: { tagline: "Precios de bebidas leídos en las etiquetas de las tiendas duty free. Introduce tu vuelo o elige dos aeropuertos para ver dónde es más barata cada botella.",
   sPrices: "{n} precios", sAirports: "{n} aeropuertos", sUpdated: "actualizado {d}", hRoute: "Tu ruta", flightLabel: "Número de vuelo o destino", flightPh: "TK199, Tokyo, IST…", find: "Buscar",
-  from: "Origen", to: "Destino", swap: "Intercambiar origen y destino", none: "— sin seleccionar —", looking: "Buscando el vuelo…", flightFound: "{code}: {a} → {b}.", noData: "Todavía no hay precios registrados para {x}.",
+  from: "Origen", to: "Destino", swap: "Intercambiar origen y destino", none: "— sin seleccionar —", looking: "Buscando el vuelo…", flightFound: "{code}: {a} → {b}. Los datos de vuelo pueden estar desactualizados; comprueba los aeropuertos.", noData: "Todavía no hay precios registrados para {x}.",
   flightNotFound: "No se encontró el vuelo {code}. Elige los aeropuertos abajo.", lookupFailed: "La búsqueda de vuelos no está disponible ahora. Elige los aeropuertos abajo.", destSet: "Destino: {x}.",
   pickHint: "Elige un aeropuerto de origen o de destino.", same: "El origen y el destino son el mismo.", gBoth: "En ambos ({n})", gOnly: "Solo visto en {x} ({n})",
   nothing: "Todavía no hay precios registrados en esta ruta. Aparecerán cuando se añadan fotos.", vSame: "Precio casi igual", vTo: "{p}% más barato en destino — no lo compres en origen", vFrom: "{p}% más barato en origen — cómpralo antes de volar",
@@ -207,6 +222,8 @@ es: { tagline: "Precios de bebidas leídos en las etiquetas de las tiendas duty 
   localMarket: "Mercado local en {c}", lBelow: "{p}% por debajo del mercado local", lAbove: "{p}% por encima del mercado local", lSame: "casi igual que el mercado local",
   perLitre: "{x} por litro", list: "lista {x}", euDest: "destino UE {x}", receipt: "confirmado con tique", partial: "lectura parcial", sizeUnknown: "tamaño ?", tryApprox: "≈ {x} TRY",
   hProducts: "Un producto, todos los lugares", searchLabel: "Producto o marca", searchPh: "chivas 18, macallan, rakı…", type: "Tipo", all: "Todos", summary: "{a} productos · {b} precios", noMatch: "No hay registros que coincidan.", refs: "Referencias de mercado",
+  old: "antiguo", wOld: "uno de los precios tiene más de un año", tre: "solo duty free", dep: "tienda de salidas", arr: "tienda de llegadas", hIndex: "Botellas de referencia", indexIntro: "Botellas vistas en tres o más aeropuertos; primero la más barata por litro.", catalog: "Consulta los precios de hoy en la tienda oficial:", allowance: "Alcohol al entrar en {c}:", allowanceSrc: "fuente oficial, leída el {d}", eRate: "demasiadas subidas hoy desde esta conexión, inténtalo mañana",
+  lic: "Datos: CC BY 4.0 · código: MIT · lista de aeropuertos de OurAirports (dominio público) · tipos de cambio: Banco Central Europeo.",
   hAdd: "Los datos crecen contigo", add1: "Los datos de este sitio crecen gracias a sus usuarios. Cuantas más fotos actuales añadáis tú y otras personas, más gente se beneficiará.",
   add2a: "Todos los datos están en ", add2b: ".",
   upIntro: "Sube una foto de una etiqueta de precio de una tienda duty free. Leemos los precios y los añadimos tras revisarla; la foto nunca se publica.",
@@ -218,7 +235,7 @@ es: { tagline: "Precios de bebidas leídos en las etiquetas de las tiendas duty 
   foot: "Los equivalentes en EUR y TRY usan el tipo del BCE del día en que se vio el precio. «Lectura parcial» indica etiquetas cortadas, tapadas o de baja resolución. Son precios de estantería del día en que se vieron y pueden haber cambiado. Este sitio no vende ni promociona nada." },
 tr: { tagline: "Duty-free raf etiketlerinden okunmuş içki fiyatları. Uçuş kodunu gir ya da iki havalimanı seç; her şişenin nerede ucuz olduğunu gör.",
   sPrices: "{n} fiyat", sAirports: "{n} havalimanı", sUpdated: "güncelleme {d}", hRoute: "Rotan", flightLabel: "Uçuş kodu ya da varış yeri", flightPh: "TK199, Tokyo, IST…", find: "Bul",
-  from: "Kalkış", to: "Varış", swap: "Kalkış ve varışı yer değiştir", none: "— seçilmedi —", looking: "Uçuş aranıyor…", flightFound: "{code}: {a} → {b}.", noData: "{x} için henüz fiyat kaydı yok.",
+  from: "Kalkış", to: "Varış", swap: "Kalkış ve varışı yer değiştir", none: "— seçilmedi —", looking: "Uçuş aranıyor…", flightFound: "{code}: {a} → {b}. Uçuş verisi eski olabilir; havalimanlarını kontrol et.", noData: "{x} için henüz fiyat kaydı yok.",
   flightNotFound: "{code} uçuşu bulunamadı. Havalimanlarını aşağıdan seç.", lookupFailed: "Uçuş araması şu an kullanılamıyor. Havalimanlarını aşağıdan seç.", destSet: "Varış: {x}.",
   pickHint: "Kalkış ya da varış havalimanı seç.", same: "Kalkış ve varış aynı.", gBoth: "İkisinde de var ({n})", gOnly: "Yalnız {x} ({n})",
   nothing: "Bu rotada henüz fiyat kaydı yok. Fotoğraf eklendikçe dolacak.", vSame: "Fiyat neredeyse aynı", vTo: "Varışta %{p} ucuz — kalkışta alma", vFrom: "Kalkışta %{p} ucuz — uçmadan al",
@@ -226,6 +243,8 @@ tr: { tagline: "Duty-free raf etiketlerinden okunmuş içki fiyatları. Uçuş k
   localMarket: "{c} yerel piyasa", lBelow: "yerel piyasanın %{p} altında", lAbove: "yerel piyasanın %{p} üstünde", lSame: "yerel piyasayla neredeyse aynı",
   perLitre: "litresi {x}", list: "liste {x}", euDest: "AB içi varış {x}", receipt: "fişle doğrulandı", partial: "kısmi okuma", sizeUnknown: "hacim ?", tryApprox: "≈ {x} TL",
   hProducts: "Bir ürün, tüm yerler", searchLabel: "Ürün ya da marka", searchPh: "chivas 18, macallan, rakı…", type: "Tür", all: "Hepsi", summary: "{a} ürün · {b} fiyat", noMatch: "Eşleşen kayıt yok.", refs: "Piyasa referansları",
+  old: "eski", wOld: "fiyatlardan biri bir yıldan eski", tre: "yalnız duty-free", dep: "kalkış mağazası", arr: "varış mağazası", hIndex: "Referans şişeler", indexIntro: "Üç ya da daha çok havalimanında görülen şişeler; litre fiyatı en ucuz olan üstte.", catalog: "Bugünkü fiyatı resmî mağazadan teyit et:", allowance: "{c} yolcu beraberi içki limiti:", allowanceSrc: "resmî kaynak, okunma {d}", eRate: "bugün bu bağlantıdan çok fazla yükleme yapıldı, lütfen yarın deneyin",
+  lic: "Veri: CC BY 4.0 · kod: MIT · havalimanı listesi OurAirports'tan (kamu malı) · kurlar: Avrupa Merkez Bankası.",
   hAdd: "Veriler sizinle büyür", add1: "Bu sitedeki veriler kullanıcılar sayesinde artmaktadır. Ne kadar güncel fotoğraf eklerseniz ve başkaları da eklerse o kadar çok insan faydalanabilir.",
   add2a: "Verinin tamamı: ", add2b: ".",
   upIntro: "Bir duty-free raf etiketinin fotoğrafını yükleyin. Fiyatları okuyup inceledikten sonra ekliyoruz; fotoğrafın kendisi hiçbir zaman yayımlanmaz.",
@@ -250,23 +269,28 @@ const tam = n => Math.round(n).toLocaleString(YEREL[L]);
 const tarih = s => new Date(s + "T00:00:00").toLocaleDateString(YEREL[L], { day: "numeric", month: "short", year: "numeric" });
 const hacim = ml => ml ? (ml >= 1000 ? (ml / 1000).toLocaleString(YEREL[L]) + " L" : ml / 10 + " cl") : t("sizeUnknown");
 const parantezsiz = s => s.replace(/\s*\([^)]*\)/g, "").trim();
-const anahtar = g => (g.marka + " " + parantezsiz(g.urun)).trim().toLowerCase();
-const pAnahtar = p => (p.marka + " " + p.urun_anahtar).toLowerCase();
-const urunAdi = g => (g.marka + " " + parantezsiz(L === "tr" ? g.urun : g.urun_en)).trim();
+const anahtar = g => g.urun_id;     // ürünler ada değil urunler.csv'deki kimliğe bağlanır
+const pAnahtar = p => p.urun_id;
+const URUN = V.urunler || {}, LIMIT = Object.fromEntries((V.limitler || []).map(l => [l.ulke, l]));
+const eskiMi = g => new Date(V.uretim) - new Date(g.tarih) > 365 * 864e5;
+const baslik = g => esc(urunAdi(g)) + (URUN[g.urun_id]?.yalniz_dutyfree ? ` <span class="rozet df">${esc(t("tre"))}</span>` : "");
+const urunAdi = g => (g.marka + " " + ((L === "tr" ? V.urunler[g.urun_id]?.ad : V.urunler[g.urun_id]?.ad_en) ?? parantezsiz(L === "tr" ? g.urun : g.urun_en))).trim();
 const ekAciklama = g => (L === "tr" ? g.urun : g.urun_en).match(/\(([^)]*)\)/)?.[1] || "";
 const yerAdi = y => L === "tr" ? y.ad : y.ad_en;
 const kod = k => `<span class="kod${YER[k].tur === "duty-free" ? "" : " sehir"}" title="${esc(yerAdi(YER[k]))}">${esc(k.replace("TYO-", ""))}</span>`;
 const yeniden = (a, b) => b.tarih.localeCompare(a.tarih);
 
 // Bir gözlem satırı: avro her zaman; yerel para, TL karşılığı ve diğer ayrıntılar alt satırda
-function satir(g, vurgu) {
+function satir(g, vurgu, litre) {
   const ek = [g.para !== "EUR" && g.fiyat != null ? para(g.fiyat, g.para) : "", g.fiyat_try != null && g.para !== "TRY" ? t("tryApprox", { x: tam(g.fiyat_try) }) : "",
     g.eur_litre != null && g.hacim_ml !== 1000 ? t("perLitre", { x: para(g.eur_litre, "EUR") }) : "", g.liste_fiyat ? t("list", { x: para(g.liste_fiyat, g.para) }) : "",
     g.fiyat_ab_ici ? t("euDest", { x: para(g.fiyat_ab_ici, g.para) }) : "", L === "tr" ? g.teklif : g.teklif_en, g.kaynak && g.kaynak.includes("fiş") ? t("receipt") : "", ekAciklama(g)]
     .filter(Boolean).map(esc);
+  if (g.magaza_yonu) ek.unshift(esc(t(g.magaza_yonu === "varış" ? "arr" : "dep")));
   if (g.guven === "kısmi") ek.push(`<span class="kismi">${esc(t("partial"))}</span>`);
-  return `<div class="satir${vurgu ? " enucuz" : ""}">${kod(g.yer_kod)}<div>${tarih(g.tarih)} · ${hacim(g.hacim_ml)} ${g.indirim_yuzde ? `<span class="rozet">−${Math.round(g.indirim_yuzde)}%</span>` : ""}</div>
-    <div class="f">${para(g.fiyat_eur, "EUR")}</div>${ek.length ? `<div class="a">${ek.join(" · ")}</div>` : ""}</div>`;
+  const eski = eskiMi(g);
+  return `<div class="satir${vurgu ? " enucuz" : ""}${eski ? " eski" : ""}">${kod(g.yer_kod)}<div>${tarih(g.tarih)} · ${hacim(g.hacim_ml)} ${g.indirim_yuzde ? `<span class="rozet">−${Math.round(g.indirim_yuzde)}%</span>` : ""}${eski ? ` <span class="rozet gri">${esc(t("old"))}</span>` : ""}</div>
+    <div class="f">${litre ? para(g.eur_litre, "EUR") + "/L" : para(g.fiyat_eur, "EUR")}</div>${ek.length ? `<div class="a">${ek.join(" · ")}</div>` : ""}</div>`;
 }
 // Ülkedeki yerel piyasa: web'den doğrulanmış perakende referansları + o ülkedeki şehir mağazası gözlemleri
 function yerelPazar(k, ulke, haricYerler) {
@@ -293,11 +317,35 @@ function pazarBlogu(k, ulke, df, haricYerler) {
   }
   return `<div class="pazar"><div class="ad">${esc(t("localMarket", { c: ULKE[L][ulke] || ulke }))}</div>${y.ref.map(refSatiri).join("")}${y.sehir.map(g => satir(g)).join("")}${hukum}</div>`;
 }
-function gruplar(yerKod) {
+// yon verilirse o yöndeki mağazanın gözlemi öne alınır (kalkış havalimanında kalkış, varışta varış mağazası)
+function gruplar(yerKod, yon) {
   const m = new Map();
   if (yerKod) for (const g of G) if (g.yer_kod === yerKod) (m.get(anahtar(g)) || m.set(anahtar(g), []).get(anahtar(g))).push(g);
-  for (const l of m.values()) l.sort(yeniden);
+  for (const l of m.values()) l.sort((p, q) => (q.magaza_yonu === yon) - (p.magaza_yonu === yon) || yeniden(p, q));
   return m;
+}
+// Rota için resmî katalog bağlantıları ve varış ülkesinin yolcu beraberi içki limiti
+function bilgi(a, b) {
+  const s = [], kat = [a, b].filter(k => k && YER[k].katalog_url).map(k => `<a href="${esc(YER[k].katalog_url)}" rel="noopener">${esc(yerAdi(YER[k]))}</a>`);
+  if (kat.length) s.push(`<div>${esc(t("catalog"))} ${kat.join(" · ")}</div>`);
+  const u = b && YER[b].ulke, l = u && (LIMIT[u] || (AB.has(u) ? LIMIT.EU : null));
+  if (l) s.push(`<div><b>${esc(t("allowance", { c: ULKE[L][u] || u }))}</b> ${esc(L === "tr" ? l.ozet_tr : l.ozet_en)} <a href="${esc(l.kaynak)}" rel="noopener">${esc(t("allowanceSrc", { d: tarih(l.okunma_tarihi) }))}</a></div>`);
+  return s.length ? `<div class="bilgi">${s.join("")}</div>` : "";
+}
+// Üç ya da daha çok havalimanında görülen şişeler: her havalimanındaki son litre fiyatı
+function endeksCiz() {
+  const m = new Map(), kartlar = [];
+  for (const g of G) if (YER[g.yer_kod].tur === "duty-free" && g.eur_litre != null) (m.get(anahtar(g)) || m.set(anahtar(g), []).get(anahtar(g))).push(g);
+  for (const l of m.values()) {
+    const son = new Map();
+    for (const g of l.sort(yeniden)) if (!son.has(g.yer_kod)) son.set(g.yer_kod, g);
+    if (son.size < 3) continue;
+    const sirali = [...son.values()].sort((p, q) => p.eur_litre - q.eur_litre);
+    kartlar.push([urunAdi(sirali[0]), `<div class="kart"><div class="urun">${baslik(sirali[0])}</div><div>${sirali.map((g, i) => satir(g, i === 0, true)).join("")}</div></div>`]);
+  }
+  kartlar.sort((p, q) => p[0].localeCompare(q[0], YEREL[L]));
+  $("endeks").innerHTML = kartlar.map(k => k[1]).join("");
+  $("endeks-bolum").hidden = !kartlar.length;
 }
 // İki taraftaki en yeni fiyatlardan kıyaslanacak çifti seç: önce aynı şişe boyu, yoksa litre fiyatı
 function cift(al, bl) {
@@ -311,7 +359,7 @@ function rotaCiz() {
   const a = $("kalkis").value, b = $("varis").value;
   if (!a && !b) { $("rota").innerHTML = `<div class="bos">${esc(t("pickHint"))}</div>`; return; }
   if (a === b) { $("rota").innerHTML = `<div class="bos">${esc(t("same"))}</div>`; return; }
-  const A = gruplar(a), B = gruplar(b), ua = a && YER[a].ulke, ub = b && YER[b].ulke, haric = [a, b].filter(Boolean);
+  const A = gruplar(a, "kalkış"), B = gruplar(b, "varış"), ua = a && YER[a].ulke, ub = b && YER[b].ulke, haric = [a, b].filter(Boolean);
   const ortak = [...A.keys()].filter(k => B.has(k)), yalnizA = [...A.keys()].filter(k => !B.has(k)), yalnizB = [...B.keys()].filter(k => !A.has(k));
   const ada = (m, k) => urunAdi(m.get(k)[0]), sirala = (m, l) => l.sort((p, q) => ada(m, p).localeCompare(ada(m, q), YEREL[L]));
   let h = "";
@@ -324,20 +372,20 @@ function rotaCiz() {
         hukum = Math.abs(fark) < 2 ? `<div class="hukum esit">${esc(t("vSame"))}</div>`
           : fark < 0 ? `<div class="hukum pahali">${esc(t("vTo", { p: Math.abs(fark).toFixed(0) }))}</div>`
           : `<div class="hukum ucuz">${esc(t("vFrom", { p: (fark / (100 + fark) * 100).toFixed(0) }))}</div>`;
-        uyari = [t("latest"), c.olcu === "litre" ? t("wLitre") : "", c.olcu === "belirsiz" ? t("wSize") : "", yil >= 1 ? t("wYears", { y: yil.toLocaleString(YEREL[L], { maximumFractionDigits: 1 }) }) : ""].filter(Boolean).join(" · ");
+        uyari = [t("latest"), c.olcu === "litre" ? t("wLitre") : "", c.olcu === "belirsiz" ? t("wSize") : "", yil >= 1 ? t("wYears", { y: yil.toLocaleString(YEREL[L], { maximumFractionDigits: 1 }) }) : "", eskiMi(c.x) || eskiMi(c.y) ? t("wOld") : ""].filter(Boolean).join(" · ");
       }
       const pazar = pazarBlogu(k, ua, al.find(g => g.eur_litre != null), haric) + (ub !== ua ? pazarBlogu(k, ub, bl.find(g => g.eur_litre != null), haric) : "");
-      return `<div class="kart"><div class="urun">${esc(urunAdi(al[0]))}</div><div class="iki"><div class="yan">${al.map(g => satir(g, c && g === c.x)).join("")}</div><div class="yan">${bl.map(g => satir(g, c && g === c.y)).join("")}</div></div>
+      return `<div class="kart"><div class="urun">${baslik(al[0])}</div><div class="iki"><div class="yan">${al.map(g => satir(g, c && g === c.x)).join("")}</div><div class="yan">${bl.map(g => satir(g, c && g === c.y)).join("")}</div></div>
         ${hukum}${uyari ? `<div class="alt">${esc(uyari)}</div>` : ""}${pazar}</div>`;
     }).join("");
   }
   const tek = (m, l, yer, ulke, diger) => l.length ? `<h3>${esc(t("gOnly", { x: yerAdi(YER[yer]), n: l.length }))}</h3>` + sirala(m, l).map(k => {
     const ol = m.get(k);
     const df = ol.find(g => g.eur_litre != null);   // yalnız bir uçta görülen ürün için de iki ülkenin yerel piyasası gösterilir
-    return `<div class="kart"><div class="urun">${esc(urunAdi(ol[0]))}</div><div>${ol.map(g => satir(g)).join("")}</div>${pazarBlogu(k, ulke, df, haric)}${diger && diger !== ulke ? pazarBlogu(k, diger, df, haric) : ""}</div>`;
+    return `<div class="kart"><div class="urun">${baslik(ol[0])}</div><div>${ol.map(g => satir(g)).join("")}</div>${pazarBlogu(k, ulke, df, haric)}${diger && diger !== ulke ? pazarBlogu(k, diger, df, haric) : ""}</div>`;
   }).join("") : "";
   h += tek(A, yalnizA, a, ua, ub) + tek(B, yalnizB, b, ub, ua);
-  $("rota").innerHTML = h || `<div class="bos">${esc(t("nothing"))}</div>`;
+  $("rota").innerHTML = bilgi(a, b) + (h || `<div class="bos">${esc(t("nothing"))}</div>`);
 }
 function urunCiz() {
   const soz = $("ara").value.toLocaleLowerCase(YEREL[L]).split(/\s+/).filter(Boolean), kat = $("kat").value, m = new Map();
@@ -351,9 +399,10 @@ function urunCiz() {
   $("urun-ozet").textContent = t("summary", { a: gr.length, b: gr.reduce((n, e) => n + e[1].length, 0) });
   $("urunliste").innerHTML = gr.map(([k, l]) => {
     l.sort((p, q) => p.yer_kod.localeCompare(q.yer_kod) || yeniden(p, q));
-    const lt = l.filter(g => g.eur_litre != null), enUcuz = lt.length > 1 ? lt.reduce((x, g) => g.eur_litre < x.eur_litre ? g : x) : null;
+    const tum = l.filter(g => g.eur_litre != null), taze = tum.filter(g => !eskiMi(g)), lt = taze.length > 1 ? taze : tum;   // en ucuz, varsa güncel fiyatlar arasından
+    const enUcuz = lt.length > 1 ? lt.reduce((x, g) => g.eur_litre < x.eur_litre ? g : x) : null;
     const ref = V.piyasa.filter(p => pAnahtar(p) === k);
-    return `<div class="kart"><div class="urun">${esc(urunAdi(l[0]))} <small>${esc(KAT[L][l[0].kategori] || l[0].kategori)}</small></div><div>${l.map(g => satir(g, g === enUcuz)).join("")}</div>
+    return `<div class="kart"><div class="urun">${baslik(l[0])} <small>${esc(KAT[L][l[0].kategori] || l[0].kategori)}</small></div><div>${l.map(g => satir(g, g === enUcuz)).join("")}</div>
       ${ref.length ? `<div class="pazar"><div class="ad">${esc(t("refs"))}</div>${ref.map(refSatiri).join("")}</div>` : ""}</div>`;
   }).join("") || `<div class="bos">${esc(t("noMatch"))}</div>`;
 }
@@ -362,6 +411,13 @@ function yerBul(q) {
   const s = q.toLocaleLowerCase("en").split(/\s+/).filter(Boolean);
   const uyan = V.yerler.filter(y => y.tur === "duty-free" && G.some(g => g.yer_kod === y.kod)).filter(y => s.every(x => (y.kod + " " + y.ad + " " + y.ad_en + " " + (y.arama || "")).toLocaleLowerCase("en").includes(x)));
   return uyan.find(y => y.kod.toLowerCase() === q.toLowerCase()) || uyan.find(y => y.tur === "duty-free") || uyan[0] || null;
+}
+// Verisi olmayan havalimanları: ad ve kod, ayrı dosyadaki tam listeden (yalnız gerektiğinde indirilir)
+let HAVA = null;
+async function havalimaniBul(q) {
+  try { HAVA = HAVA || await (await fetch("havalimanlari.json")).json(); } catch { return null; }
+  const s = q.toLocaleLowerCase("en").split(/\s+/).filter(Boolean);
+  return HAVA.find(h => h[0].toLowerCase() === q.toLowerCase()) || HAVA.find(h => s.every(x => (h[1] + " " + h[2]).toLocaleLowerCase("en").includes(x))) || null;
 }
 async function ucusAra(e) {
   e.preventDefault();
@@ -383,7 +439,7 @@ async function ucusAra(e) {
     return;
   }
   const y = yerBul(q);
-  if (!y) return durum("noData", { x: q });
+  if (!y) { const h = await havalimaniBul(q); return durum("noData", { x: h ? `${h[1]} (${h[0]})` : q }); }
   $("varis").value = y.kod; rotaCiz(); durum("destSet", { x: `${yerAdi(y)} (${y.kod.replace("TYO-", "")})` });
 }
 // Fotoğrafı tarayıcıda JPEG'e çevirip küçültür: gövde sınırına sığar, EXIF (konum dahil) taşınmaz
@@ -419,8 +475,8 @@ async function yukle(e) {
       const r = await fetch("/api/yukle?" + q, { method: "POST", headers: { "Content-Type": "image/jpeg" }, body: govde });
       if (r.ok) { tamam++; continue; }
       const h = (await r.json().catch(() => ({}))).hata;
-      neden = { full: "eFull", size: "eSize", type: "eType", fields: "eFields" }[h] || "eNet";
-      if (h === "full" || h === "fields") break;
+      neden = { full: "eFull", size: "eSize", type: "eType", fields: "eFields", rate: "eRate" }[h] || "eNet";
+      if (h === "full" || h === "fields" || h === "rate") break;
     } catch { neden = "eType"; }
   }
   $("y-gonder").disabled = false;
@@ -446,7 +502,7 @@ function dilUygula(d) {
   $("kat").value = k;
   $("urunler").innerHTML = [...new Set(G.map(urunAdi))].sort((p, q) => p.localeCompare(q, YEREL[L])).map(u => `<option value="${esc(u)}">`).join("");
   if (sonDurum) $("durum").textContent = t(...sonDurum);
-  rotaCiz(); urunCiz();
+  rotaCiz(); endeksCiz(); urunCiz();
 }
 function kur() {
   let d = "en";

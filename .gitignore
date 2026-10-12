@@ -10,6 +10,7 @@ TODO.md
 COZUMLER.md
 # Yayın klasörü: api/ ve yapılandırma depoda; üretilen sayfa, bağımlılıklar ve Vercel CLI dosyaları değil
 site/index.html
+site/havalimanlari.json
 site/node_modules/
 site/.vercel/
 site/.env*

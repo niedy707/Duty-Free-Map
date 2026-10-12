@@ -18,6 +18,13 @@ Sitede:
   mağazası gözlemleri, duty-free fiyatının yanında.
 - **Bir ürün, tüm yerler:** bir ürünün hangi havalimanında hangi tarihte kaça görüldüğü.
 - Her fiyat avro karşılığıyla, varsa yerel para birimiyle ve o günkü kurla TL karşılığıyla gösterilir.
+- **Kalkış / varış mağazası:** her duty-free fiyatının hangi taraftaki mağazadan olduğu yazar; varış havalimanında
+  varış mağazasının fiyatı öne alınır.
+- **Eski fiyat:** 12 aydan eski gözlem "eski" rozetiyle ve soluk görünür.
+- **Yalnız duty-free:** yalnız havalimanlarında satılan sürümler işaretlidir (yerel piyasada karşılığı aranmaz).
+- **Referans şişeler:** üç ya da daha çok havalimanında görülen şişelerin litre fiyatı yan yana.
+- **Resmî mağaza ve limit:** adresi doğrulanmış havalimanları için resmî çevrim içi mağaza bağlantısı; varış ülkesi
+  için yolcu beraberi içki limiti (yalnız resmî kaynağı okunmuş ülkeler).
 
 Uçuş kodundan rota bulmak için ziyaretçinin tarayıcısı `api.adsbdb.com`'a yalnız uçuş kodunu gönderir.
 
@@ -30,15 +37,18 @@ Yüklenen fotoğraf **hiçbir zaman yayımlanmaz**; yalnız fiyatları okunup ve
 
 1. Tarayıcı fotoğrafı JPEG'e çevirip en çok 3000 piksele küçültür (konum dahil EXIF bilgisi bu sırada
    düşer) ve `POST /api/yukle`'ye gönderir. Yükleyen, havalimanını/mağazayı ve tarihi formda yazar.
-2. Uç yalnız sitenin kendi sayfasından gelen JPEG'i kabul eder (4 MB sınırı, alan denetimi, bekleyen
-   100'e ulaşınca yeni yükleme almaz) ve dosyayı **özel erişimli** Vercel Blob deposunda `bekleyen/`
+2. Uç yalnız sitenin kendi sayfasından gelen JPEG'i kabul eder (4 MB sınırı, alan denetimi, aynı kaynaktan
+   günde en çok 10 yükleme, bekleyen 100'e ulaşınca yeni yükleme almaz) ve dosyayı **özel erişimli** Vercel Blob deposunda `bekleyen/`
    altına koyar. Depo adresleri dışarıdan açılmaz, hiçbir yanıtta dönmez.
 3. `GET /api/bekleyen` yalnız bekleyen sayısını verir; bakımcıya bildirim bu sayıdan üretilir.
 4. Bakımcı `python3 yukleme.py liste | indir | isaretle <ad>` ile kuyruğu inceler, fiyatları
    `fiyatlar.csv`'ye işler, siteyi yeniden dağıtır. İncelenen yükleme silinmez, `islenen/` altına
    işaret konur.
 
-Bilinen eksik: IP başına hız sınırı yok; kötüye kullanıma karşı tek fren kuyruk sınırıdır.
+Günlük sınır için IP adresi saklanmaz; yalnız o güne özgü, tuzlanmış bir özetinin sayacı tutulur.
+
+Her gönderimde `.github/workflows/denetim.yml` veriyi denetler (CSV tutarlılığı, ürün kimlikleri, çevrilmemiş
+açıklama). Yayın elle yapılır.
 
 ## Dosyalar
 
@@ -46,6 +56,10 @@ Bilinen eksik: IP başına hız sınırı yok; kötüye kullanıma karşı tek f
 |---|---|
 | `fiyatlar.csv` | **Kaynak.** Okunan her fiyat bir satır |
 | `yerler.csv` | **Kaynak.** Havalimanı / mağaza listesi (IATA kodu, Türkçe ve İngilizce ad, ülke, mağaza, konum, arama sözcükleri) |
+| `urunler.csv` | **Kaynak.** Ürün ana tablosu: `urun_id`, marka, ad, yaş, `yalniz_dutyfree`, normal sürüm karşılığı, barkod. Gözlemler ürüne **ada değil kimliğe** bağlanır; aynı ürünün farklı yazımları tek kimlikte birleşir |
+| `limitler.csv` | **Kaynak.** Ülkeye göre yolcu beraberi içki limiti: özet, resmî kaynak adresi, okunma tarihi |
+| `havalimanlari.csv` | Tarifeli seferi olan 3.244 havalimanı (IATA, ad, şehir, ülke, konum) — [OurAirports](https://github.com/davidmegginson/ourairports-data) verisinden süzüldü (kamu malı) |
+| `yer_ekle.py` | Yeni havalimanını `yerler.csv`'ye ekler: `python3 yer_ekle.py LHR` |
 | `piyasa.csv` | **Kaynak.** Mağaza dışı referans fiyatlar: ülke, tür (`yerel` · `öneri` · `duty-free` · `müzayede`), `fiyatlar.csv` ile eşleşen marka + ürün anahtarı, fiyat aralığı, kur, kaynak adresi |
 | `db_kur.py` | Üç CSV'den SQLite `fiyatlar.db`'yi kurar (`yer`, `gozlem`, `piyasa` tabloları) |
 | `site/api/` | Vercel işlevleri: `yukle.js` (fotoğraf kabul), `bekleyen.js` (sayaç), `_ortak.js` |
@@ -66,6 +80,8 @@ Yalnız Python 3 standart kitaplığı kullanılır. `fiyatlar.db`, `sayfa.html`
 | `id` | Artan sıra numarası |
 | `tarih` | Fiyatın görüldüğü gün (çekildiği yerin tarihiyle) |
 | `yer_kod`, `yer`, `ulke`, `magaza`, `magaza_turu` | `yerler.csv`'deki kayıt; `duty-free` ya da `şehir mağazası` |
+| `magaza_yonu` | Duty-free için `kalkış` ya da `varış`; şehir mağazasında boş |
+| `urun_id` | `urunler.csv`'deki ürün kimliği |
 | `kategori` | viski · konyak · rom · rakı · likör · cin · votka · tekila · absent · şarap · şampanya · bira · sake · şoçu · soju · sigara |
 | `marka`, `urun`, `yas` | `yas` boşsa yaş beyansız |
 | `hacim_ml`, `abv` | Etikette ya da şişede okunabiliyorsa; okunamıyorsa **boş** |
@@ -114,6 +130,16 @@ satır `kısmi` yazılır ve neyin eksik olduğu `not`'a girer.
 
 Fiyatlar görüldüğü günün raf fiyatıdır; bugün farklı olabilir. Bu depo bir satış ya da tanıtım
 kanalı değildir, yalnız fiyat kaydıdır.
+
+## Lisans
+
+- **Kod:** MIT — [`LICENSE`](LICENSE).
+- **Veri:** CC BY 4.0 — [`LICENSE-DATA.md`](LICENSE-DATA.md). Kaynak göstererek serbestçe kullanılabilir.
+- Siteye yüklenen fotoğraflardan okunan fiyatlar da bu veriye girer ve aynı lisansla yayımlanır; fotoğrafın kendisi yayımlanmaz.
+
+Kullanılan açık kaynaklar: havalimanı listesi [OurAirports](https://github.com/davidmegginson/ourairports-data) (kamu malı),
+kurlar Avrupa Merkez Bankası ([Frankfurter](https://github.com/lineofflight/frankfurter) üzerinden), uçuş rotası
+[adsbdb](https://github.com/mrjackwills/adsbdb).
 
 ## Ön tarama (12.10.2026)
 

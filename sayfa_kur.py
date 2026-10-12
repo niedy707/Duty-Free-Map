@@ -25,10 +25,12 @@ BELGE_BASI = """<!doctype html>
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 """
 # Sayfaya giren sütunlar. `not` bilerek dışarıda: serbest Türkçe metin, çok dilli sayfada gösterilmiyor.
-GOZLEM = ["id", "tarih", "yer_kod", "kategori", "marka", "urun", "yas", "hacim_ml", "abv", "para", "fiyat", "fiyat_ab_ici",
+GOZLEM = ["id", "tarih", "yer_kod", "magaza_yonu", "kategori", "urun_id", "marka", "urun", "yas", "hacim_ml", "abv", "para", "fiyat", "fiyat_ab_ici",
           "liste_fiyat", "indirim_yuzde", "coklu_teklif", "fiyat_eur", "eur_litre", "fiyat_try", "kaynak", "guven"]
-YER = ["kod", "ad", "ad_en", "ulke", "tur", "arama"]
-PIYASA = ["tarih", "ulke", "tur", "marka", "urun_anahtar", "hacim_ml", "pazar", "pazar_en", "para", "fiyat_alt", "fiyat_ust",
+YER = ["kod", "ad", "ad_en", "ulke", "tur", "katalog_url", "arama"]
+URUN = ["urun_id", "yalniz_dutyfree", "es_urun_id"]
+LIMIT = ["ulke", "ozet_tr", "ozet_en", "kaynak", "okunma_tarihi"]
+PIYASA = ["tarih", "ulke", "tur", "urun_id", "hacim_ml", "pazar", "pazar_en", "para", "fiyat_alt", "fiyat_ust",
           "kur_eur", "kaynak"]
 
 # Ürün adındaki Türkçe açıklamalar -> İngilizce (sıra önemli: uzun kalıp önce)
@@ -125,7 +127,20 @@ def main():
         p["eur_alt"] = round(p["fiyat_alt"] / k, 2) if p["fiyat_alt"] is not None else None
         p["eur_ust"] = round(p["fiyat_ust"] / k, 2) if p["fiyat_ust"] is not None else None
         p["kaynak"] = (p["kaynak"] or "").split(" ; ")[0] or None
-    veri = {"uretim": date.today().isoformat(), "yerler": yerler, "gozlem": gozlem, "piyasa": piyasa}
+    urunler = {u["urun_id"]: {k: v for k, v in u.items() if k != "urun_id" and v} for u in oku("urunler.csv", URUN)}
+    bilinmeyen = sorted({g["urun_id"] for g in gozlem} | {p["urun_id"] for p in piyasa}, key=str)
+    bilinmeyen = [k for k in bilinmeyen if k not in urunler]
+    if bilinmeyen:
+        sys.exit("HATA: urunler.csv'de olmayan urun_id: " + ", ".join(map(str, bilinmeyen[:8])))
+    # Bir ürünün sayfada tek adı olur: gözlemlerindeki en kısa parantezsiz yazım (aynı ürün farklı yazılmış olabilir)
+    yalin = lambda s: re.sub(r"\s*\([^)]*\)", "", s).strip()
+    for g in gozlem:
+        u = urunler[g["urun_id"]]
+        for alan, deger in (("ad", yalin(g["urun"])), ("ad_en", yalin(g["urun_en"]))):
+            if deger and (alan not in u or len(deger) < len(u[alan])):
+                u[alan] = deger
+    veri = {"uretim": date.today().isoformat(), "yerler": yerler, "gozlem": gozlem, "piyasa": piyasa,
+            "urunler": {k: v for k, v in urunler.items() if v}, "limitler": oku("limitler.csv", LIMIT)}
     with open(os.path.join(KOK, "sayfa_sablon.html"), encoding="utf-8") as f:
         sablon = f.read()
     if "/*VERI*/" not in sablon:
@@ -140,6 +155,13 @@ def main():
     os.makedirs(os.path.join(KOK, "site"), exist_ok=True)
     with open(os.path.join(KOK, "site", "index.html"), "w", encoding="utf-8") as f:
         f.write(BELGE_BASI + bas + ayrac + "\n</head>\n<body>" + govde + "</body>\n</html>\n")
+    # Tüm havalimanları ayrı dosyada: sayfa yalnız varış araması boş dönünce indirir
+    with open(os.path.join(KOK, "havalimanlari.csv"), encoding="utf-8", newline="") as f:
+        hava = [[h["iata"], h["ad"], h["sehir"], h["ulke"]] for h in csv.DictReader(f)]
+    if len(hava) < 1000:
+        sys.exit(f"HATA: havalimanlari.csv beklenenden kısa ({len(hava)} satır)")
+    with open(os.path.join(KOK, "site", "havalimanlari.json"), "w", encoding="utf-8") as f:
+        json.dump(hava, f, ensure_ascii=False, separators=(",", ":"))
     print(f"sayfa.html + site/index.html üretildi: {len(gozlem)} gözlem · {len(yerler)} yer · {len(piyasa)} piyasa")
 
 
