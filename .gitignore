@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+# Türetilmiş dosyalar — db_kur.py ve sayfa_kur.py üretir
+fiyatlar.db
+sayfa.html
+# Kişisel: çekim saati, fotoğraf adı, iç notlar
+ozel/
+CLAUDE.md
+TODO.md
+COZUMLER.md

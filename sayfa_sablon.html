@@ -1,0 +1,226 @@
+<title>Duty Free Defteri</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Yerleşim: tek sütun, telefon öncelikli. Üstte rota kıyası (kalkış ↔ varış), altında aranabilir fiyat defteri.
+   Dil: havalimanı yönlendirme tabelası — sarı zemin üstünde koyu IATA kodu, fiyatlar eş aralıklı rakamla. */
+:root {
+  --zemin: #f3f4f1; --kagit: #ffffff; --murekkep: #14191f; --soluk: #5d6772; --cizgi: #d9dcd6;
+  --tabela: #f5c400; --tabela-yazi: #14191f; --ucuz: #0f7a4d; --pahali: #b3321f; --ucuz-zemin: #e3f3ea; --pahali-zemin: #f8e6e2;
+  --baslik: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --govde: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  --rakam: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --zemin: #0f1317; --kagit: #171c22; --murekkep: #e9ecef; --soluk: #97a1ac; --cizgi: #2a323b;
+  --tabela: #f5c400; --tabela-yazi: #14191f; --ucuz: #4cc38a; --pahali: #f0816d; --ucuz-zemin: #12301f; --pahali-zemin: #3a1a14; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --zemin: #0f1317; --kagit: #171c22; --murekkep: #e9ecef; --soluk: #97a1ac; --cizgi: #2a323b;
+  --tabela: #f5c400; --tabela-yazi: #14191f; --ucuz: #4cc38a; --pahali: #f0816d; --ucuz-zemin: #12301f; --pahali-zemin: #3a1a14; color-scheme: dark }
+
+body { background: var(--zemin); color: var(--murekkep); font: 15px/1.45 var(--govde); padding-inline: 16px; padding-block: 20px 48px; }
+.sayfa { max-width: 760px; margin-inline: auto; display: grid; gap: 28px; }
+h1 { font: 700 34px/1 var(--baslik); letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h2 { font: 700 22px/1.1 var(--baslik); letter-spacing: .02em; text-transform: uppercase; margin: 0; }
+.ust { display: grid; gap: 8px; }
+.ust p { margin: 0; color: var(--soluk); max-width: 62ch; }
+.sayilar { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 13px var(--rakam); color: var(--soluk); }
+.sayilar b { color: var(--murekkep); font-weight: 500; }
+
+.kod { display: inline-block; background: var(--tabela); color: var(--tabela-yazi); font: 700 15px/1 var(--baslik); letter-spacing: .04em;
+  padding: 4px 6px 3px; border-radius: 3px; white-space: nowrap; }
+.kod.sehir { background: transparent; color: var(--murekkep); box-shadow: inset 0 0 0 1.5px var(--murekkep); }
+
+.bolum { display: grid; gap: 14px; }
+.denetim { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.denetim label { display: grid; gap: 4px; font-size: 12px; color: var(--soluk); flex: 1 1 150px; min-width: 0; }
+select, input[type="search"] { font: 15px var(--govde); color: var(--murekkep); background: var(--kagit); border: 1px solid var(--cizgi);
+  border-radius: 6px; padding: 9px 10px; width: 100%; min-width: 0; }
+button.cevir { font: 600 18px/1 var(--govde); background: var(--kagit); color: var(--murekkep); border: 1px solid var(--cizgi); border-radius: 6px;
+  padding: 9px 13px; cursor: pointer; }
+select:focus-visible, input:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--tabela); outline-offset: 2px; }
+
+.liste { display: grid; gap: 10px; }
+.kart { background: var(--kagit); border: 1px solid var(--cizgi); border-radius: 8px; padding: 12px 14px; display: grid; gap: 10px; min-width: 0; }
+.urun { font-weight: 600; overflow-wrap: anywhere; }
+.urun small { font-weight: 400; color: var(--soluk); }
+.iki { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.yan { display: grid; gap: 3px; align-content: start; min-width: 0; }
+.fiyat { font: 500 19px/1.2 var(--rakam); font-variant-numeric: tabular-nums; }
+.alt { font-size: 12px; color: var(--soluk); overflow-wrap: anywhere; }
+.hukum { font-size: 13px; font-weight: 600; padding: 6px 9px; border-radius: 5px; }
+.hukum.ucuz { background: var(--ucuz-zemin); color: var(--ucuz); }
+.hukum.pahali { background: var(--pahali-zemin); color: var(--pahali); }
+.hukum.esit { background: var(--zemin); color: var(--soluk); }
+.bos { color: var(--soluk); padding: 14px; border: 1px dashed var(--cizgi); border-radius: 8px; }
+
+.satir { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: baseline; padding-top: 8px; border-top: 1px solid var(--cizgi); }
+.satir:first-of-type { border-top: 0; padding-top: 0; }
+.satir .f { font: 500 15px var(--rakam); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.satir .a { grid-column: 2 / -1; font-size: 12px; color: var(--soluk); overflow-wrap: anywhere; }
+.rozet { font: 500 11px var(--rakam); padding: 1px 5px; border-radius: 3px; background: var(--ucuz-zemin); color: var(--ucuz); white-space: nowrap; }
+.kismi { color: var(--pahali); }
+.enucuz .f { color: var(--ucuz); }
+details { background: var(--kagit); border: 1px solid var(--cizgi); border-radius: 8px; padding: 10px 14px; }
+summary { cursor: pointer; font-weight: 600; }
+.tablo { overflow-x: auto; margin-top: 10px; }
+table { border-collapse: collapse; font-size: 13px; min-width: 560px; }
+th, td { text-align: left; padding: 6px 10px 6px 0; border-top: 1px solid var(--cizgi); vertical-align: top; }
+th { color: var(--soluk); font-weight: 500; border-top: 0; }
+td.r { font-family: var(--rakam); font-variant-numeric: tabular-nums; white-space: nowrap; }
+a { color: inherit; }
+.dip { font-size: 12px; color: var(--soluk); max-width: 70ch; }
+</style>
+
+<div class="sayfa">
+  <header class="ust">
+    <h1>Duty Free Defteri</h1>
+    <p>Kendi çektiğim raf etiketlerinden okunan içki fiyatları. Kalkış ve varış havalimanını seç; ikisinde de gördüğüm ürünlerin hangisinde ucuz olduğunu gösterir.</p>
+    <div class="sayilar" id="sayilar"></div>
+  </header>
+
+  <section class="bolum" aria-labelledby="b-rota">
+    <h2 id="b-rota">Rota kıyası</h2>
+    <div class="denetim">
+      <label for="kalkis">Kalkış<select id="kalkis"></select></label>
+      <button class="cevir" id="cevir" type="button" aria-label="Kalkış ve varışı yer değiştir">⇄</button>
+      <label for="varis">Varış<select id="varis"></select></label>
+    </div>
+    <div class="liste" id="rota"></div>
+  </section>
+
+  <section class="bolum" aria-labelledby="b-defter">
+    <h2 id="b-defter">Fiyat defteri</h2>
+    <div class="denetim">
+      <label for="ara" style="flex-basis:100%">Ürün ya da marka<input id="ara" type="search" placeholder="macallan, rakı, double black…" autocomplete="off"></label>
+      <label for="kat">Tür<select id="kat"></select></label>
+      <label for="yer">Yer<select id="yer"></select></label>
+    </div>
+    <div class="alt" id="defter-ozet"></div>
+    <div class="liste" id="defter"></div>
+  </section>
+
+  <section class="bolum" aria-labelledby="b-piyasa">
+    <h2 id="b-piyasa">Piyasa referansları</h2>
+    <details>
+      <summary id="piyasa-baslik">Mağaza dışı fiyatlar</summary>
+      <div class="tablo"><table id="piyasa"></table></div>
+    </details>
+  </section>
+
+  <p class="dip" id="dip"></p>
+</div>
+
+<script id="veri" type="application/json">/*VERI*/</script>
+<script>
+const V = JSON.parse(document.getElementById("veri").textContent);
+const YER = Object.fromEntries(V.yerler.map(y => [y.kod, y]));
+const G = V.gozlem.filter(g => g.kategori !== "sigara");
+const $ = id => document.getElementById(id);
+const para = (n, p) => n == null ? "—" : n.toLocaleString("tr-TR", { minimumFractionDigits: p === "JPY" || p === "DKK" || p === "SEK" ? 0 : 2, maximumFractionDigits: 2 }) + " " + ({ EUR: "€", JPY: "¥", DKK: "DKK", SEK: "SEK" }[p] || p);
+const tarih = t => t.split("-").reverse().join(".");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const taban = g => (g.marka + " " + g.urun.replace(/\s*\([^)]*\)/g, "")).trim();
+const anahtar = g => taban(g).toLocaleLowerCase("tr");
+const hacim = ml => ml ? (ml >= 1000 ? (ml / 1000).toLocaleString("tr-TR") + " L" : ml / 10 + " cl") : "hacim ?";
+const kod = k => `<span class="kod${YER[k].tur === "duty-free" ? "" : " sehir"}" title="${esc(YER[k].ad)}">${esc(k.replace("TYO-", ""))}</span>`;
+
+// Bir yerde bir ürün+hacim için en yeni fiyatlı gözlem
+function sonGozlemler(yerKod) {
+  const m = new Map();
+  for (const g of G) {
+    if (g.yer_kod !== yerKod || g.fiyat == null) continue;
+    const k = anahtar(g) + "|" + (g.hacim_ml || "");
+    if (!m.has(k) || m.get(k).tarih < g.tarih) m.set(k, g);
+  }
+  return [...m.values()];
+}
+function eslestir(a, b) {
+  const cift = [];
+  const bGrup = new Map();
+  for (const g of sonGozlemler(b)) (bGrup.get(anahtar(g)) || bGrup.set(anahtar(g), []).get(anahtar(g))).push(g);
+  const aGrup = new Map();
+  for (const g of sonGozlemler(a)) (aGrup.get(anahtar(g)) || aGrup.set(anahtar(g), []).get(anahtar(g))).push(g);
+  for (const [k, al] of aGrup) {
+    const bl = bGrup.get(k);
+    if (!bl) continue;
+    let bulundu = false;
+    for (const x of al) for (const y of bl) if (x.hacim_ml && x.hacim_ml === y.hacim_ml) { cift.push({ x, y, olcu: "sise" }); bulundu = true; }
+    if (bulundu) continue;
+    const x = al.sort((p, q) => q.tarih.localeCompare(p.tarih))[0], y = bl.sort((p, q) => q.tarih.localeCompare(p.tarih))[0];
+    cift.push({ x, y, olcu: x.hacim_ml && y.hacim_ml ? "litre" : "belirsiz" });
+  }
+  return cift;
+}
+function yanKart(g, olcu) {
+  const litre = olcu === "litre" && g.eur_litre != null ? ` · litresi ${para(g.eur_litre, "EUR")}` : "";
+  const ind = g.indirim_yuzde ? ` · %${Math.round(g.indirim_yuzde)} indirimli` : "";
+  return `<div class="yan"><div>${kod(g.yer_kod)}</div><div class="fiyat">${para(g.fiyat_eur, "EUR")}</div>
+    <div class="alt">${g.para !== "EUR" ? para(g.fiyat, g.para) + " · " : ""}${hacim(g.hacim_ml)}${litre}${ind}</div>
+    <div class="alt">${tarih(g.tarih)}${g.guven === "kısmi" ? ' · <span class="kismi">kısmi okuma</span>' : ""}</div></div>`;
+}
+function rotaCiz() {
+  const a = $("kalkis").value, b = $("varis").value;
+  const cift = a === b ? [] : eslestir(a, b);
+  if (!cift.length) { $("rota").innerHTML = `<div class="bos">${a === b ? "Kalkış ve varış aynı." : "Bu iki yerde ortak gördüğüm ürün yok. Fotoğraf ekledikçe dolacak."}</div>`; return; }
+  $("rota").innerHTML = cift.map(({ x, y, olcu }) => {
+    const fa = olcu === "litre" ? x.eur_litre : x.fiyat_eur, fb = olcu === "litre" ? y.eur_litre : y.fiyat_eur;
+    const fark = (fb - fa) / fa * 100, yil = Math.abs(new Date(x.tarih) - new Date(y.tarih)) / 864e5 / 365;
+    let h, s;
+    if (Math.abs(fark) < 2) { h = "esit"; s = "Fiyat neredeyse aynı"; }
+    else if (fark < 0) { h = "pahali"; s = `Varışta %${Math.abs(fark).toFixed(0)} ucuz — kalkışta alma`; }
+    else { h = "ucuz"; s = `Kalkışta %${(fark / (100 + fark) * 100).toFixed(0)} ucuz — kalkışta al`; }
+    const uyari = [olcu === "litre" ? "şişe boyları farklı, litre fiyatı kıyaslandı" : "", olcu === "belirsiz" ? "bir tarafta hacim okunamadı" : "",
+      yil >= 1 ? `iki fiyat arasında ${yil.toFixed(1).replace(".", ",")} yıl var` : ""].filter(Boolean).join(" · ");
+    return `<div class="kart"><div class="urun">${esc(taban(x))}</div><div class="iki">${yanKart(x, olcu)}${yanKart(y, olcu)}</div>
+      <div class="hukum ${h}">${s}</div>${uyari ? `<div class="alt">${uyari}</div>` : ""}</div>`;
+  }).join("");
+}
+function defterCiz() {
+  const q = $("ara").value.trim().toLocaleLowerCase("tr"), kat = $("kat").value, yer = $("yer").value;
+  const grup = new Map();
+  for (const g of G) {
+    if (kat && g.kategori !== kat) continue;
+    if (q && !(g.marka + " " + g.urun + " " + g.kategori).toLocaleLowerCase("tr").includes(q)) continue;
+    (grup.get(anahtar(g)) || grup.set(anahtar(g), []).get(anahtar(g))).push(g);
+  }
+  let gruplar = [...grup.values()];
+  if (yer) gruplar = gruplar.filter(l => l.some(g => g.yer_kod === yer));
+  gruplar.sort((p, q2) => taban(p[0]).localeCompare(taban(q2[0]), "tr"));
+  $("defter-ozet").textContent = `${gruplar.length} ürün · ${gruplar.reduce((n, l) => n + l.length, 0)} fiyat`;
+  $("defter").innerHTML = gruplar.map(l => {
+    l.sort((p, q2) => q2.tarih.localeCompare(p.tarih) || p.yer_kod.localeCompare(q2.yer_kod));
+    const litreli = l.filter(g => g.eur_litre != null), enUcuz = litreli.length > 1 ? litreli.reduce((m, g) => g.eur_litre < m.eur_litre ? g : m) : null;
+    return `<div class="kart"><div class="urun">${esc(taban(l[0]))} <small>${esc(l[0].kategori)}</small></div><div>` + l.map(g => {
+      const ek = [g.urun.match(/\(([^)]*)\)/)?.[1], g.liste_fiyat ? `liste ${para(g.liste_fiyat, g.para)}` : "", g.fiyat_ab_ici ? `AB içi varış ${para(g.fiyat_ab_ici, g.para)}` : "",
+        g.coklu_teklif, g.kaynak && g.kaynak.includes("fiş") ? "fişle doğrulandı" : "", g.guven === "kısmi" ? `<span class="kismi">kısmi: ${esc(g.not)}</span>` : ""].filter(Boolean)
+        .map((s, i) => i < 5 && !String(s).startsWith("<span") ? esc(s) : s).join(" · ");
+      return `<div class="satir${g === enUcuz ? " enucuz" : ""}">${kod(g.yer_kod)}<div>${tarih(g.tarih)} · ${hacim(g.hacim_ml)} ${g.indirim_yuzde ? `<span class="rozet">−%${Math.round(g.indirim_yuzde)}</span>` : ""}</div>
+        <div class="f">${g.fiyat == null ? "—" : para(g.fiyat, g.para)}${g.para !== "EUR" && g.fiyat_eur != null ? `<br><span class="alt">${para(g.fiyat_eur, "EUR")}</span>` : ""}</div>${ek ? `<div class="a">${ek}</div>` : ""}</div>`;
+    }).join("") + `</div></div>`;
+  }).join("") || `<div class="bos">Eşleşen kayıt yok.</div>`;
+}
+function kur() {
+  const tarihler = G.map(g => g.tarih).sort(), dfYer = V.yerler.filter(y => y.tur === "duty-free" && G.some(g => g.yer_kod === y.kod));
+  $("sayilar").innerHTML = `<span><b>${G.length}</b> fiyat</span><span><b>${dfYer.length}</b> havalimanı</span><span><b>${tarih(tarihler[0])}</b> – <b>${tarih(tarihler.at(-1))}</b></span><span>güncelleme <b>${tarih(V.uretim)}</b></span>`;
+  const secenek = y => `<option value="${y.kod}">${esc(y.kod.replace("TYO-", ""))} — ${esc(y.ad)}</option>`;
+  const yerler = V.yerler.filter(y => G.some(g => g.yer_kod === y.kod));
+  $("kalkis").innerHTML = $("varis").innerHTML = yerler.map(secenek).join("");
+  $("yer").innerHTML = `<option value="">Hepsi</option>` + yerler.map(secenek).join("");
+  $("kat").innerHTML = `<option value="">Hepsi</option>` + [...new Set(G.map(g => g.kategori))].sort((a, b) => a.localeCompare(b, "tr")).map(k => `<option>${esc(k)}</option>`).join("");
+  // Açılışta en çok ortak ürünü olan havalimanı çifti
+  let en = [yerler[0].kod, yerler[1].kod, -1];
+  for (const a of dfYer) for (const b of dfYer) if (a.kod < b.kod) { const n = eslestir(a.kod, b.kod).length; if (n > en[2]) en = [a.kod, b.kod, n]; }
+  $("kalkis").value = en[0]; $("varis").value = en[1];
+  $("piyasa-baslik").textContent = `Mağaza dışı fiyatlar (${V.piyasa.length} kayıt)`;
+  $("piyasa").innerHTML = `<tr><th>Ürün</th><th>Pazar</th><th>Fiyat</th><th>Tarih</th></tr>` + V.piyasa.map(p =>
+    `<tr><td>${esc(p.urun)}${p.not ? `<br><span class="alt">${esc(p.not)}</span>` : ""}</td><td>${esc(p.pazar)}</td>
+     <td class="r">${para(p.fiyat_alt, p.para)}${p.fiyat_ust != null ? " – " + para(p.fiyat_ust, p.para) : ""}</td>
+     <td class="r">${p.kaynak ? `<a href="${esc(p.kaynak.split(" ; ")[0])}" rel="noopener">${tarih(p.tarih)}</a>` : tarih(p.tarih)}</td></tr>`).join("");
+  $("dip").textContent = "Avro karşılıkları fotoğrafın çekildiği günün ECB kuruyla hesaplandı. “Kısmi okuma” etiketin kesik, örtülü ya da düşük çözünürlüklü olduğu satırlardır. Kişisel kayıt; fiyatlar çekildiği günün raf fiyatıdır, bugün farklı olabilir.";
+  for (const id of ["kalkis", "varis"]) $(id).addEventListener("change", rotaCiz);
+  $("cevir").addEventListener("click", () => { const k = $("kalkis").value; $("kalkis").value = $("varis").value; $("varis").value = k; rotaCiz(); });
+  for (const id of ["ara", "kat", "yer"]) $(id).addEventListener("input", defterCiz);
+  rotaCiz(); defterCiz();
+}
+kur();
+</script>
