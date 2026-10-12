@@ -149,10 +149,10 @@ const G = V.gozlem.filter(g => g.kategori !== "sigara");
 const AB = new Set(["BE", "IT", "DK", "SE", "DE", "FR"]);
 const YEREL = { en: "en-GB", de: "de-DE", es: "es-ES", tr: "tr-TR" };
 const KAT = {
-  en: { viski: "Whisky", konyak: "Cognac", rom: "Rum", "rakı": "Rakı", "likör": "Liqueur", "şarap": "Wine", "şampanya": "Champagne", bira: "Beer" },
-  de: { viski: "Whisky", konyak: "Cognac", rom: "Rum", "rakı": "Rakı", "likör": "Likör", "şarap": "Wein", "şampanya": "Champagner", bira: "Bier" },
-  es: { viski: "Whisky", konyak: "Coñac", rom: "Ron", "rakı": "Rakı", "likör": "Licor", "şarap": "Vino", "şampanya": "Champán", bira: "Cerveza" },
-  tr: { viski: "Viski", konyak: "Konyak", rom: "Rom", "rakı": "Rakı", "likör": "Likör", "şarap": "Şarap", "şampanya": "Şampanya", bira: "Bira" } };
+  en: { viski: "Whisky", konyak: "Cognac", rom: "Rum", "rakı": "Rakı", "likör": "Liqueur", "şarap": "Wine", "şampanya": "Champagne", bira: "Beer", cin: "Gin", votka: "Vodka", tekila: "Tequila", absent: "Absinthe", sake: "Sake", "şoçu": "Shōchū", soju: "Soju" },
+  de: { viski: "Whisky", konyak: "Cognac", rom: "Rum", "rakı": "Rakı", "likör": "Likör", "şarap": "Wein", "şampanya": "Champagner", bira: "Bier", cin: "Gin", votka: "Wodka", tekila: "Tequila", absent: "Absinth", sake: "Sake", "şoçu": "Shōchū", soju: "Soju" },
+  es: { viski: "Whisky", konyak: "Coñac", rom: "Ron", "rakı": "Rakı", "likör": "Licor", "şarap": "Vino", "şampanya": "Champán", bira: "Cerveza", cin: "Ginebra", votka: "Vodka", tekila: "Tequila", absent: "Absenta", sake: "Sake", "şoçu": "Shōchū", soju: "Soju" },
+  tr: { viski: "Viski", konyak: "Konyak", rom: "Rom", "rakı": "Rakı", "likör": "Likör", "şarap": "Şarap", "şampanya": "Şampanya", bira: "Bira", cin: "Cin", votka: "Votka", tekila: "Tekila", absent: "Absent", sake: "Sake", "şoçu": "Şoçu", soju: "Soju" } };
 const ULKE = {
   en: { TR: "Türkiye", JP: "Japan", KKTC: "North Cyprus", BE: "Belgium", IT: "Italy", DK: "Denmark", SE: "Sweden", DE: "Germany" },
   de: { TR: "der Türkei", JP: "Japan", KKTC: "Nordzypern", BE: "Belgien", IT: "Italien", DK: "Dänemark", SE: "Schweden", DE: "Deutschland" },
@@ -260,7 +260,7 @@ const yeniden = (a, b) => b.tarih.localeCompare(a.tarih);
 
 // Bir gözlem satırı: avro her zaman; yerel para, TL karşılığı ve diğer ayrıntılar alt satırda
 function satir(g, vurgu) {
-  const ek = [g.para !== "EUR" && g.fiyat != null ? para(g.fiyat, g.para) : "", g.fiyat_try != null ? t("tryApprox", { x: tam(g.fiyat_try) }) : "",
+  const ek = [g.para !== "EUR" && g.fiyat != null ? para(g.fiyat, g.para) : "", g.fiyat_try != null && g.para !== "TRY" ? t("tryApprox", { x: tam(g.fiyat_try) }) : "",
     g.eur_litre != null && g.hacim_ml !== 1000 ? t("perLitre", { x: para(g.eur_litre, "EUR") }) : "", g.liste_fiyat ? t("list", { x: para(g.liste_fiyat, g.para) }) : "",
     g.fiyat_ab_ici ? t("euDest", { x: para(g.fiyat_ab_ici, g.para) }) : "", L === "tr" ? g.teklif : g.teklif_en, g.kaynak && g.kaynak.includes("fiş") ? t("receipt") : "", ekAciklama(g)]
     .filter(Boolean).map(esc);
@@ -331,11 +331,12 @@ function rotaCiz() {
         ${hukum}${uyari ? `<div class="alt">${esc(uyari)}</div>` : ""}${pazar}</div>`;
     }).join("");
   }
-  const tek = (m, l, yer, ulke) => l.length ? `<h3>${esc(t("gOnly", { x: yerAdi(YER[yer]), n: l.length }))}</h3>` + sirala(m, l).map(k => {
+  const tek = (m, l, yer, ulke, diger) => l.length ? `<h3>${esc(t("gOnly", { x: yerAdi(YER[yer]), n: l.length }))}</h3>` + sirala(m, l).map(k => {
     const ol = m.get(k);
-    return `<div class="kart"><div class="urun">${esc(urunAdi(ol[0]))}</div><div>${ol.map(g => satir(g)).join("")}</div>${pazarBlogu(k, ulke, ol.find(g => g.eur_litre != null), haric)}</div>`;
+    const df = ol.find(g => g.eur_litre != null);   // yalnız bir uçta görülen ürün için de iki ülkenin yerel piyasası gösterilir
+    return `<div class="kart"><div class="urun">${esc(urunAdi(ol[0]))}</div><div>${ol.map(g => satir(g)).join("")}</div>${pazarBlogu(k, ulke, df, haric)}${diger && diger !== ulke ? pazarBlogu(k, diger, df, haric) : ""}</div>`;
   }).join("") : "";
-  h += tek(A, yalnizA, a, ua) + tek(B, yalnizB, b, ub);
+  h += tek(A, yalnizA, a, ua, ub) + tek(B, yalnizB, b, ub, ua);
   $("rota").innerHTML = h || `<div class="bos">${esc(t("nothing"))}</div>`;
 }
 function urunCiz() {
@@ -359,7 +360,7 @@ function urunCiz() {
 function durum(k, v) { sonDurum = k ? [k, v] : null; $("durum").textContent = k ? t(k, v) : ""; }
 function yerBul(q) {
   const s = q.toLocaleLowerCase("en").split(/\s+/).filter(Boolean);
-  const uyan = V.yerler.filter(y => G.some(g => g.yer_kod === y.kod)).filter(y => s.every(x => (y.kod + " " + y.ad + " " + y.ad_en + " " + (y.arama || "")).toLocaleLowerCase("en").includes(x)));
+  const uyan = V.yerler.filter(y => y.tur === "duty-free" && G.some(g => g.yer_kod === y.kod)).filter(y => s.every(x => (y.kod + " " + y.ad + " " + y.ad_en + " " + (y.arama || "")).toLocaleLowerCase("en").includes(x)));
   return uyan.find(y => y.kod.toLowerCase() === q.toLowerCase()) || uyan.find(y => y.tur === "duty-free") || uyan[0] || null;
 }
 async function ucusAra(e) {
@@ -435,8 +436,8 @@ function dilUygula(d) {
   for (const e of document.querySelectorAll("[data-t]")) e.textContent = t(e.dataset.t);
   for (const e of document.querySelectorAll("[data-tp]")) e.placeholder = t(e.dataset.tp);
   for (const e of document.querySelectorAll("[data-ta]")) e.setAttribute("aria-label", t(e.dataset.ta));
-  const tarihler = G.map(g => g.tarih).sort(), yerler = V.yerler.filter(y => G.some(g => g.yer_kod === y.kod));
-  $("sayilar").innerHTML = [t("sPrices", { n: `<b>${G.length}</b>` }), t("sAirports", { n: `<b>${yerler.filter(y => y.tur === "duty-free").length}</b>` }),
+  const tarihler = G.map(g => g.tarih).sort(), yerler = V.yerler.filter(y => y.tur === "duty-free" && G.some(g => g.yer_kod === y.kod));
+  $("sayilar").innerHTML = [t("sPrices", { n: `<b>${G.length}</b>` }), t("sAirports", { n: `<b>${yerler.length}</b>` }),
     `<b>${tarih(tarihler[0])}</b> – <b>${tarih(tarihler.at(-1))}</b>`, t("sUpdated", { d: `<b>${tarih(V.uretim)}</b>` })].map(s => `<span>${s}</span>`).join("");
   const secenek = y => `<option value="${y.kod}">${esc(y.kod.replace("TYO-", ""))} — ${esc(yerAdi(y))}</option>`;
   for (const id of ["kalkis", "varis"]) { const v = $(id).value; $(id).innerHTML = `<option value="">${esc(t("none"))}</option>` + yerler.map(secenek).join(""); $(id).value = v; }

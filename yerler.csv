@@ -10,3 +10,14 @@ STR,Stuttgart Havalimanı,Stuttgart Airport,DE,duty-free,,48.6896,9.1948,stuttga
 HND,Tokyo Haneda Havalimanı,Tokyo Haneda Airport,JP,duty-free,,35.5481,139.7911,tokyo haneda
 TYO-GNZ1,Tokyo Ginza — içki mağazası (adı fotoğrafta yok),Tokyo Ginza — liquor store,JP,şehir mağazası,,35.6739,139.7652,tokyo ginza
 TYO-GNZ2,Tokyo Ginza — koleksiyon viski mağazası (adı fotoğrafta yok),Tokyo Ginza — collectors' whisky shop,JP,şehir mağazası,,35.6713,139.7606,tokyo ginza
+GNT-VGM1,Gent Vogelmarkt — Albert Heijn,Ghent Vogelmarkt — Albert Heijn,BE,şehir mağazası,Albert Heijn,51.0501,3.7249,gent ghent gand vogelmarkt albert heijn belcika belgium
+ROM-PAR1,Roma Parione (Via della Chiesa Nuova) — süpermarket,Rome Parione (Via della Chiesa Nuova) — supermarket,IT,şehir mağazası,Pam (dolap kenarındaki logo etiketinden),41.8978,12.4693,roma rome parione chiesa nuova pam
+CPH-VST1,Kopenhag Vesterbro (Niels Brocks Gade) — süpermarket (adı fotoğrafta yok),Copenhagen Vesterbro (Niels Brocks Gade) — supermarket,DK,şehir mağazası,,55.6722,12.5728,copenhagen kopenhag kobenhavn vesterbro niels brocks gade
+IST-M1,İstanbul — süpermarket 1,Istanbul — supermarket 1,TR,şehir mağazası,,,,istanbul
+IST-M2,İstanbul — süpermarket 2,Istanbul — supermarket 2,TR,şehir mağazası,,,,istanbul
+IST-M3,İstanbul — süpermarket 3,Istanbul — supermarket 3,TR,şehir mağazası,,,,istanbul
+IST-M4,İstanbul — süpermarket 4,Istanbul — supermarket 4,TR,şehir mağazası,,,,istanbul
+IST-M5,İstanbul — süpermarket 5,Istanbul — supermarket 5,TR,şehir mağazası,,,,istanbul
+IST-T1,İstanbul — tekel bayii,Istanbul — liquor shop,TR,şehir mağazası,,,,istanbul
+TYO-GNZ3,Tokyo Ginza 3-chōme — market (etikette FamilyMart özel markası 'ファミマル' logosu; tabela fotoğrafta yok),Tokyo Ginza 3-chōme — convenience store,JP,şehir mağazası,,35.6708,139.7679,tokyo ginza 3-chome familymart konbini
+TYO-GNZ4,Tokyo Ginza 7-chōme — market (adı fotoğrafta yok),Tokyo Ginza 7-chōme — convenience store,JP,şehir mağazası,,35.6708,139.7600,tokyo ginza 7-chome konbini

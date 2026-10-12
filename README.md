@@ -66,7 +66,7 @@ Yalnız Python 3 standart kitaplığı kullanılır. `fiyatlar.db`, `sayfa.html`
 | `id` | Artan sıra numarası |
 | `tarih` | Fiyatın görüldüğü gün (çekildiği yerin tarihiyle) |
 | `yer_kod`, `yer`, `ulke`, `magaza`, `magaza_turu` | `yerler.csv`'deki kayıt; `duty-free` ya da `şehir mağazası` |
-| `kategori` | viski · konyak · rom · rakı · likör · şarap · şampanya · bira · sigara |
+| `kategori` | viski · konyak · rom · rakı · likör · cin · votka · tekila · absent · şarap · şampanya · bira · sake · şoçu · soju · sigara |
 | `marka`, `urun`, `yas` | `yas` boşsa yaş beyansız |
 | `hacim_ml`, `abv` | Etikette ya da şişede okunabiliyorsa; okunamıyorsa **boş** |
 | `para`, `fiyat` | O gün tek şişe için kasada ödenecek fiyat (indirim uygulanmış). Şehir mağazasında vergi dahil |
@@ -84,21 +84,33 @@ Yalnız Python 3 standart kitaplığı kullanılır. `fiyatlar.db`, `sayfa.html`
 Okuma kuralı: kesik etiket tahminle tamamlanmaz. Ürün adı ya da fiyatın bir hanesi görünmüyorsa
 satır `kısmi` yazılır ve neyin eksik olduğu `not`'a girer.
 
-## Kapsam (12.10.2026 itibarıyla 147 gözlem)
+## Kapsam (12.10.2026 itibarıyla 291 gözlem)
 
-| Kod | Yer | Gözlem | Tarihler |
+**Duty-free — 110 gözlem, 9 havalimanı**
+
+| Kod | Havalimanı | Gözlem | Tarihler |
 |---|---|---|---|
-| ECN | Ercan Havalimanı — Kaner Duty Free | 36 | 18.06.2022 · 03.06.2023 · 13.06.2024 |
+| ECN | Ercan — Kaner Duty Free | 36 | 18.06.2022 · 03.06.2023 · 13.06.2024 |
 | IST | İstanbul Havalimanı | 28 | 18.06.2022 · 05.10.2026 |
-| SAW | Sabiha Gökçen Havalimanı | 20 | 05.09.2022 · 13.06.2024 |
-| HND | Tokyo Haneda Havalimanı | 14 | 12.10.2026 |
+| SAW | Sabiha Gökçen | 20 | 05.09.2022 · 13.06.2024 |
+| HND | Tokyo Haneda | 14 | 12.10.2026 |
 | CPH | Kopenhag — Heinemann Tax Free | 3 | 18.09.2024 |
 | STR | Stuttgart | 3 | 29.11.2024 |
 | CRL | Brüksel Güney Charleroi | 2 | 09.09.2022 |
 | FCO | Roma Fiumicino | 2 | 25.10.2023 |
 | ARN | Stockholm Arlanda | 2 | 19.09.2024 |
-| TYO-GNZ1 | Tokyo Ginza — içki mağazası (şehir, kıyas için) | 13 | 11.10.2026 |
-| TYO-GNZ2 | Tokyo Ginza — koleksiyon viski mağazası (şehir, kıyas için) | 24 | 11.10.2026 |
+
+**Şehir mağazası (yerel piyasa kıyası için) — 181 gözlem, 13 mağaza**
+
+| Şehir | Mağaza | Gözlem | Yıllar |
+|---|---|---|---|
+| İstanbul | 5 süpermarket + 1 tekel bayii (`IST-M1`…`IST-M5`, `IST-T1`) | 84 | 2024–2026 |
+| Tokyo | Ginza'da 4 mağaza (`TYO-GNZ1`…`TYO-GNZ4`) | 80 | 2026 |
+| Gent | Albert Heijn (`GNT-VGM1`) | 13 | 2022 |
+| Kopenhag | süpermarket (`CPH-VST1`) | 3 | 2024 |
+| Roma | süpermarket (`ROM-PAR1`) | 1 | 2023 |
+
+İstanbul'daki mağazalar bilerek semt, sokak ve koordinat olmadan kaydedilir.
 
 Fiyatlar görüldüğü günün raf fiyatıdır; bugün farklı olabilir. Bu depo bir satış ya da tanıtım
 kanalı değildir, yalnız fiyat kaydıdır.

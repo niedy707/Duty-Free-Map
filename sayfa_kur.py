@@ -55,9 +55,27 @@ URUN_EN = [
     ("(kutuda: ", "(on the box: "),
     ("(etiket: ", "(label: "),
     ("2 kadehli set", "gift set with 2 glasses"),
+    ("(etiket adı kesik: ", "(name cut off on the tag: "),
+    ("(etikette yalnız ", "(tag says only "),
+    ("(ürün adı kesik: ", "(product name cut off: "),
+    ("(kırmızı etiket; seri adı okunmuyor)", "(red label; series name unreadable)"),
+    ("(bölge serisi; alt adı okunmuyor)", "(regional series; sub-name unreadable)"),
+    ("(siyah etiket; alt adı okunmuyor)", "(black label; sub-name unreadable)"),
+    ("(yeşil etiket; üzüm adı okunmuyor)", "(green label; grape unreadable)"),
+    ("(kırmızı şeritli etiket; üzüm adı okunmuyor)", "(red-striped label; grape unreadable)"),
+    ("(mor-mavi şeritli etiket; üzüm adı okunmuyor)", "(purple-blue striped label; grape unreadable)"),
+    ("(üzüm adı okunmuyor)", "(grape unreadable)"),
+    ("(kupaj adı okunmuyor)", "(blend name unreadable)"),
+    ("; armut likörü; üretici okunmuyor)", "; pear liqueur; producer unreadable)"),
+    ("Spritz hazır kokteyl (3×20 cl paket)", "Spritz ready-to-drink cocktail (3×20 cl pack)"),
+    ("(İrlanda)", "(Ireland)"),
+    ("(şeffaf)", "(clear)"),
+    ("(siyah)", "(black)"),
+    ("(şişe)", "(bottle)"),
 ]
 TR_HARF = re.compile(r"[çğışöüÇĞİŞÖÜ]")
-SERBEST = ("Rakı", "Kavaklıdere", "Gökçen", "Shōsetsu")   # Türkçe harf taşıyan özel adlar
+SERBEST = ("Rakı", "Kavaklıdere", "Gökçen", "Shōsetsu", "Vişne", "Buzbağ", "Şahsına", "Münhasır", "Boğazkere", "Karası",
+           "Öküzgözü", "Sır", "Tuğra", "Tütsü")   # Türkçe harf taşıyan özel adlar
 
 
 def urun_en(s):
@@ -71,6 +89,8 @@ def teklif_en(s):
         return s
     if s == "2. ürüne %15, 3. ürüne %25 indirim":
         return "15% off the 2nd item, 25% off the 3rd"
+    if s.startswith("bardak hediyeli (şişe boynunda "):
+        return s.replace("bardak hediyeli (şişe boynunda ", "free glass included (neck tag: ")
     s = re.sub(r"\d[\d.,]*\d", lambda m: m.group().translate(str.maketrans(".,", ",.")), s)   # 17.920 -> 17,920 · 6,50 -> 6.50
     s = re.sub(r"\(şişesi ([\d.,]+)\)", r"(\1 each)", s)
     return s.replace("şişe", "bottles")
@@ -90,6 +110,8 @@ def main():
     for g in gozlem:
         g["urun_en"], g["teklif"], g["teklif_en"] = urun_en(g["urun"]), g.pop("coklu_teklif"), None
         g["teklif_en"] = teklif_en(g["teklif"])
+        if g["marka"].startswith("("):
+            cevrilmemis.append(f"id {g['id']} marka açıklama içeriyor (açıklama ürün adına yazılır): {g['marka']}")
         for alan in ("urun_en", "teklif_en"):
             kalan = g[alan] or ""
             for ad in SERBEST:
