@@ -13,3 +13,5 @@ site/index.html
 site/node_modules/
 site/.vercel/
 site/.env*
+# İç planlama: tarama raporu ve öneri defteri
+viski_tara*
