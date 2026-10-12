@@ -73,6 +73,11 @@ select:focus-visible, input:focus-visible, button:focus-visible, summary:focus-v
 a { color: inherit; }
 .katki { display: grid; gap: 8px; border-left: 4px solid var(--tabela); padding-left: 14px; }
 .katki p { margin: 0; max-width: 62ch; }
+.yukle { display: grid; gap: 10px; max-width: 520px; }
+.yukle label { display: grid; gap: 4px; font-size: 12px; color: var(--soluk); min-width: 0; }
+.yukle input[type="file"], .yukle input[type="date"] { font: 14px var(--govde); color: var(--murekkep); background: var(--kagit); border: 1px solid var(--cizgi); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0; box-sizing: border-box; }
+.yukle button[disabled] { opacity: .55; cursor: default; }
+.gizli { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .dip { font-size: 12px; color: var(--soluk); max-width: 70ch; margin: 0; }
 </style>
 
@@ -117,7 +122,20 @@ a { color: inherit; }
   <section class="katki" aria-labelledby="b-katki">
     <h2 id="b-katki" data-t="hAdd"></h2>
     <p data-t="add1"></p>
-    <p><span data-t="add2a"></span><a href="https://github.com/niedy707/Duty-Free-Map" rel="noopener">GitHub</a><span data-t="add2b"></span></p>
+    <p data-t="upIntro"></p>
+    <form class="yukle" id="yukle-form">
+      <label for="y-foto"><span data-t="upPhoto"></span><input id="y-foto" type="file" accept="image/*" multiple></label>
+      <div class="denetim">
+        <label for="y-yer"><span data-t="upPlace"></span><input id="y-yer" type="text" maxlength="60" autocomplete="off" data-tp="upPlacePh"></label>
+        <label for="y-tarih"><span data-t="upDate"></span><input id="y-tarih" type="date"></label>
+      </div>
+      <label for="y-not"><span data-t="upNote"></span><input id="y-not" type="text" maxlength="300" autocomplete="off"></label>
+      <div class="gizli" aria-hidden="true"><label for="y-web">Website<input id="y-web" type="text" tabindex="-1" autocomplete="off"></label></div>
+      <div><button class="dugme" type="submit" id="y-gonder" data-t="upSend"></button></div>
+      <div class="durum" id="y-durum" role="status"></div>
+      <p class="alt" data-t="upPrivacy"></p>
+    </form>
+    <p class="alt"><span data-t="add2a"></span><a href="https://github.com/niedy707/Duty-Free-Map" rel="noopener">GitHub</a><span data-t="add2b"></span></p>
   </section>
 
   <p class="dip" data-t="foot"></p>
@@ -152,7 +170,13 @@ en: { tagline: "Liquor prices read from duty-free shelf tags. Enter your flight 
   perLitre: "{x} per litre", list: "list {x}", euDest: "EU destination {x}", receipt: "confirmed by receipt", partial: "partial reading", sizeUnknown: "size ?", tryApprox: "≈ {x} TRY",
   hProducts: "One product, every location", searchLabel: "Product or brand", searchPh: "chivas 18, macallan, rakı…", type: "Type", all: "All", summary: "{a} products · {b} prices", noMatch: "No matching records.", refs: "Market references",
   hAdd: "The data grows with you", add1: "The data on this site grows thanks to its users. The more up-to-date photos you and others add, the more people benefit.",
-  add2a: "Photo upload isn't available yet. For now you can share shelf-tag photos and get the full data set on ", add2b: ".",
+  add2a: "The full data set is on ", add2b: ".",
+  upIntro: "Upload a photo of a duty-free shelf tag. We read the prices and add them after review; the photo itself is never published.",
+  upPhoto: "Photos (up to 5)", upPlace: "Airport or shop", upPlacePh: "Istanbul Airport, IST…", upDate: "Date seen", upNote: "Note (optional)", upSend: "Upload",
+  upPrivacy: "Photos are shrunk in your browser before upload, which also removes their location data. Please keep people and personal information out of the frame.",
+  upNoFile: "Choose at least one photo.", upNoPlace: "Tell us the airport or shop.", upProgress: "Uploading {i} of {n}…", upDone: "Thank you — {n} received. Prices appear after review.",
+  upSome: "{n} of {t} received. The rest failed: {why}.", upFail: "Upload failed: {why}.",
+  eFull: "the review queue is full, please try again later", eSize: "the photo is too large", eType: "the file isn't a readable photo", eFields: "check the place and date", eNet: "upload isn't available right now",
   foot: "EUR and TRY equivalents use the ECB rate on the day the price was seen. “Partial reading” marks tags that were cut off, covered or low-resolution. These are shelf prices on the day they were seen and may have changed. This site does not sell or promote anything." },
 de: { tagline: "Spirituosenpreise, direkt von Duty-free-Regaletiketten abgelesen. Flugnummer eingeben oder zwei Flughäfen wählen und sehen, wo jede Flasche günstiger ist.",
   sPrices: "{n} Preise", sAirports: "{n} Flughäfen", sUpdated: "aktualisiert {d}", hRoute: "Deine Route", flightLabel: "Flugnummer oder Ziel", flightPh: "TK199, Tokyo, IST…", find: "Suchen",
@@ -165,7 +189,13 @@ de: { tagline: "Spirituosenpreise, direkt von Duty-free-Regaletiketten abgelesen
   perLitre: "{x} pro Liter", list: "Liste {x}", euDest: "EU-Ziel {x}", receipt: "per Kassenbon bestätigt", partial: "teilweise gelesen", sizeUnknown: "Größe ?", tryApprox: "≈ {x} TRY",
   hProducts: "Ein Produkt, alle Orte", searchLabel: "Produkt oder Marke", searchPh: "chivas 18, macallan, rakı…", type: "Art", all: "Alle", summary: "{a} Produkte · {b} Preise", noMatch: "Keine passenden Einträge.", refs: "Marktreferenzen",
   hAdd: "Die Daten wachsen mit euch", add1: "Die Daten auf dieser Seite wachsen dank ihrer Nutzer. Je mehr aktuelle Fotos du und andere hinzufügen, desto mehr Menschen profitieren.",
-  add2a: "Einen Foto-Upload gibt es noch nicht. Bis dahin kannst du Fotos von Regaletiketten teilen und den gesamten Datensatz abrufen auf ", add2b: ".",
+  add2a: "Der gesamte Datensatz liegt auf ", add2b: ".",
+  upIntro: "Lade ein Foto eines Duty-free-Regaletiketts hoch. Wir lesen die Preise ab und fügen sie nach Prüfung hinzu; das Foto selbst wird nie veröffentlicht.",
+  upPhoto: "Fotos (bis zu 5)", upPlace: "Flughafen oder Geschäft", upPlacePh: "Istanbul Airport, IST…", upDate: "Gesehen am", upNote: "Notiz (optional)", upSend: "Hochladen",
+  upPrivacy: "Fotos werden vor dem Hochladen im Browser verkleinert; dabei werden auch die Standortdaten entfernt. Bitte keine Personen oder persönlichen Angaben im Bild.",
+  upNoFile: "Wähle mindestens ein Foto.", upNoPlace: "Nenne den Flughafen oder das Geschäft.", upProgress: "Lade {i} von {n} hoch…", upDone: "Danke — {n} erhalten. Die Preise erscheinen nach der Prüfung.",
+  upSome: "{n} von {t} erhalten. Der Rest ist fehlgeschlagen: {why}.", upFail: "Hochladen fehlgeschlagen: {why}.",
+  eFull: "die Prüfwarteschlange ist voll, bitte später erneut versuchen", eSize: "das Foto ist zu groß", eType: "die Datei ist kein lesbares Foto", eFields: "Ort und Datum prüfen", eNet: "der Upload ist gerade nicht verfügbar",
   foot: "EUR- und TRY-Werte nutzen den EZB-Kurs des Tages, an dem der Preis gesehen wurde. „Teilweise gelesen“ markiert Etiketten, die abgeschnitten, verdeckt oder unscharf waren. Es sind Regalpreise vom jeweiligen Tag; sie können sich geändert haben. Diese Seite verkauft und bewirbt nichts." },
 es: { tagline: "Precios de bebidas leídos en las etiquetas de las tiendas duty free. Introduce tu vuelo o elige dos aeropuertos para ver dónde es más barata cada botella.",
   sPrices: "{n} precios", sAirports: "{n} aeropuertos", sUpdated: "actualizado {d}", hRoute: "Tu ruta", flightLabel: "Número de vuelo o destino", flightPh: "TK199, Tokyo, IST…", find: "Buscar",
@@ -178,7 +208,13 @@ es: { tagline: "Precios de bebidas leídos en las etiquetas de las tiendas duty 
   perLitre: "{x} por litro", list: "lista {x}", euDest: "destino UE {x}", receipt: "confirmado con tique", partial: "lectura parcial", sizeUnknown: "tamaño ?", tryApprox: "≈ {x} TRY",
   hProducts: "Un producto, todos los lugares", searchLabel: "Producto o marca", searchPh: "chivas 18, macallan, rakı…", type: "Tipo", all: "Todos", summary: "{a} productos · {b} precios", noMatch: "No hay registros que coincidan.", refs: "Referencias de mercado",
   hAdd: "Los datos crecen contigo", add1: "Los datos de este sitio crecen gracias a sus usuarios. Cuantas más fotos actuales añadáis tú y otras personas, más gente se beneficiará.",
-  add2a: "Todavía no se pueden subir fotos. Por ahora puedes compartir fotos de etiquetas y obtener todos los datos en ", add2b: ".",
+  add2a: "Todos los datos están en ", add2b: ".",
+  upIntro: "Sube una foto de una etiqueta de precio de una tienda duty free. Leemos los precios y los añadimos tras revisarla; la foto nunca se publica.",
+  upPhoto: "Fotos (hasta 5)", upPlace: "Aeropuerto o tienda", upPlacePh: "Istanbul Airport, IST…", upDate: "Fecha en que se vio", upNote: "Nota (opcional)", upSend: "Subir",
+  upPrivacy: "Las fotos se reducen en tu navegador antes de subirlas, lo que también elimina sus datos de ubicación. Evita que aparezcan personas o datos personales.",
+  upNoFile: "Elige al menos una foto.", upNoPlace: "Indica el aeropuerto o la tienda.", upProgress: "Subiendo {i} de {n}…", upDone: "Gracias — {n} recibidas. Los precios aparecerán tras la revisión.",
+  upSome: "{n} de {t} recibidas. El resto falló: {why}.", upFail: "La subida falló: {why}.",
+  eFull: "la cola de revisión está llena, inténtalo más tarde", eSize: "la foto es demasiado grande", eType: "el archivo no es una foto legible", eFields: "revisa el lugar y la fecha", eNet: "la subida no está disponible ahora",
   foot: "Los equivalentes en EUR y TRY usan el tipo del BCE del día en que se vio el precio. «Lectura parcial» indica etiquetas cortadas, tapadas o de baja resolución. Son precios de estantería del día en que se vieron y pueden haber cambiado. Este sitio no vende ni promociona nada." },
 tr: { tagline: "Duty-free raf etiketlerinden okunmuş içki fiyatları. Uçuş kodunu gir ya da iki havalimanı seç; her şişenin nerede ucuz olduğunu gör.",
   sPrices: "{n} fiyat", sAirports: "{n} havalimanı", sUpdated: "güncelleme {d}", hRoute: "Rotan", flightLabel: "Uçuş kodu ya da varış yeri", flightPh: "TK199, Tokyo, IST…", find: "Bul",
@@ -191,7 +227,13 @@ tr: { tagline: "Duty-free raf etiketlerinden okunmuş içki fiyatları. Uçuş k
   perLitre: "litresi {x}", list: "liste {x}", euDest: "AB içi varış {x}", receipt: "fişle doğrulandı", partial: "kısmi okuma", sizeUnknown: "hacim ?", tryApprox: "≈ {x} TL",
   hProducts: "Bir ürün, tüm yerler", searchLabel: "Ürün ya da marka", searchPh: "chivas 18, macallan, rakı…", type: "Tür", all: "Hepsi", summary: "{a} ürün · {b} fiyat", noMatch: "Eşleşen kayıt yok.", refs: "Piyasa referansları",
   hAdd: "Veriler sizinle büyür", add1: "Bu sitedeki veriler kullanıcılar sayesinde artmaktadır. Ne kadar güncel fotoğraf eklerseniz ve başkaları da eklerse o kadar çok insan faydalanabilir.",
-  add2a: "Fotoğraf yükleme henüz yok. Şimdilik raf etiketi fotoğraflarını paylaşmak ve verinin tamamını almak için: ", add2b: ".",
+  add2a: "Verinin tamamı: ", add2b: ".",
+  upIntro: "Bir duty-free raf etiketinin fotoğrafını yükleyin. Fiyatları okuyup inceledikten sonra ekliyoruz; fotoğrafın kendisi hiçbir zaman yayımlanmaz.",
+  upPhoto: "Fotoğraflar (en çok 5)", upPlace: "Havalimanı ya da mağaza", upPlacePh: "İstanbul Havalimanı, IST…", upDate: "Görüldüğü tarih", upNote: "Not (isteğe bağlı)", upSend: "Yükle",
+  upPrivacy: "Fotoğraflar yüklenmeden önce tarayıcınızda küçültülür; bu sırada konum bilgisi de silinir. Lütfen kadrajda insan ya da kişisel bilgi olmasın.",
+  upNoFile: "En az bir fotoğraf seçin.", upNoPlace: "Havalimanını ya da mağazayı yazın.", upProgress: "{n} fotoğraftan {i}. yükleniyor…", upDone: "Teşekkürler — {n} fotoğraf alındı. Fiyatlar incelemeden sonra görünür.",
+  upSome: "{t} fotoğraftan {n} tanesi alındı. Kalanı yüklenemedi: {why}.", upFail: "Yükleme başarısız: {why}.",
+  eFull: "inceleme kuyruğu dolu, lütfen daha sonra deneyin", eSize: "fotoğraf çok büyük", eType: "dosya okunabilir bir fotoğraf değil", eFields: "yer ve tarihi kontrol edin", eNet: "yükleme şu an kullanılamıyor",
   foot: "Avro ve TL karşılıkları fiyatın görüldüğü günün ECB kuruyla hesaplandı. “Kısmi okuma” etiketin kesik, örtülü ya da düşük çözünürlüklü olduğu satırlardır. Fiyatlar görüldüğü günün raf fiyatıdır, bugün farklı olabilir. Bu site satış ya da tanıtım yapmaz." } };
 
 let L = "en", sonDurum = null;
@@ -343,6 +385,48 @@ async function ucusAra(e) {
   if (!y) return durum("noData", { x: q });
   $("varis").value = y.kod; rotaCiz(); durum("destSet", { x: `${yerAdi(y)} (${y.kod.replace("TYO-", "")})` });
 }
+// Fotoğrafı tarayıcıda JPEG'e çevirip küçültür: gövde sınırına sığar, EXIF (konum dahil) taşınmaz
+async function kucult(dosya) {
+  let kaynak;
+  try { kaynak = await createImageBitmap(dosya, { imageOrientation: "from-image" }); }
+  catch {
+    kaynak = await new Promise((tamam, hata) => { const i = new Image(); i.onload = () => tamam(i); i.onerror = hata; i.src = URL.createObjectURL(dosya); });
+  }
+  const gen = kaynak.width || kaynak.naturalWidth, yuk = kaynak.height || kaynak.naturalHeight, olcek = Math.min(1, 3000 / Math.max(gen, yuk));
+  const tuval = document.createElement("canvas");
+  tuval.width = Math.round(gen * olcek); tuval.height = Math.round(yuk * olcek);
+  tuval.getContext("2d").drawImage(kaynak, 0, 0, tuval.width, tuval.height);
+  for (let kalite = 0.85; kalite > 0.4; kalite -= 0.1) {
+    const b = await new Promise(r => tuval.toBlob(r, "image/jpeg", kalite));
+    if (b && b.size <= 3800000) return b;
+  }
+  return null;
+}
+async function yukle(e) {
+  e.preventDefault();
+  const yaz = (k, v) => { $("y-durum").textContent = t(k, v); }, dosyalar = [...$("y-foto").files].slice(0, 5), yer = $("y-yer").value.trim();
+  if (!dosyalar.length) return yaz("upNoFile");
+  if (yer.length < 2) return yaz("upNoPlace");
+  const q = new URLSearchParams({ yer, tarih: $("y-tarih").value, not: $("y-not").value.trim(), web: $("y-web").value });
+  let tamam = 0, neden = "eNet";
+  $("y-gonder").disabled = true;
+  for (let i = 0; i < dosyalar.length; i++) {
+    yaz("upProgress", { i: i + 1, n: dosyalar.length });
+    try {
+      const govde = await kucult(dosyalar[i]);
+      if (!govde) { neden = "eSize"; continue; }
+      const r = await fetch("/api/yukle?" + q, { method: "POST", headers: { "Content-Type": "image/jpeg" }, body: govde });
+      if (r.ok) { tamam++; continue; }
+      const h = (await r.json().catch(() => ({}))).hata;
+      neden = { full: "eFull", size: "eSize", type: "eType", fields: "eFields" }[h] || "eNet";
+      if (h === "full" || h === "fields") break;
+    } catch { neden = "eType"; }
+  }
+  $("y-gonder").disabled = false;
+  if (tamam === dosyalar.length) { yaz("upDone", { n: tamam }); $("y-foto").value = ""; $("y-not").value = ""; }
+  else if (tamam) yaz("upSome", { n: tamam, t: dosyalar.length, why: t(neden) });
+  else yaz("upFail", { why: t(neden) });
+}
 function dilUygula(d) {
   L = T[d] ? d : "en";
   document.documentElement.lang = L;
@@ -376,6 +460,8 @@ function kur() {
   for (const id of ["kalkis", "varis"]) $(id).addEventListener("change", () => { durum(null); rotaCiz(); });
   $("cevir").addEventListener("click", () => { const k = $("kalkis").value; $("kalkis").value = $("varis").value; $("varis").value = k; rotaCiz(); });
   $("ucus-form").addEventListener("submit", ucusAra);
+  $("yukle-form").addEventListener("submit", yukle);
+  $("y-tarih").value = new Date().toISOString().slice(0, 10); $("y-tarih").max = $("y-tarih").value;
   for (const id of ["ara", "kat"]) $(id).addEventListener("input", urunCiz);
   rotaCiz();
 }

@@ -22,7 +22,23 @@ Sitede:
 Uçuş kodundan rota bulmak için ziyaretçinin tarayıcısı `api.adsbdb.com`'a yalnız uçuş kodunu gönderir.
 
 Veriler raf fotoğraflarıyla büyür. Ne kadar güncel fotoğraf eklenirse o kadar çok kişi
-faydalanabilir. Şimdilik tek kişinin gözlemleridir; fotoğraf yükleme akışı henüz yok.
+faydalanabilir. Sitedeki formdan herkes raf etiketi fotoğrafı yükleyebilir.
+
+## Fotoğraf yükleme ve inceleme
+
+Yüklenen fotoğraf **hiçbir zaman yayımlanmaz**; yalnız fiyatları okunup veriye eklenir.
+
+1. Tarayıcı fotoğrafı JPEG'e çevirip en çok 3000 piksele küçültür (konum dahil EXIF bilgisi bu sırada
+   düşer) ve `POST /api/yukle`'ye gönderir. Yükleyen, havalimanını/mağazayı ve tarihi formda yazar.
+2. Uç yalnız sitenin kendi sayfasından gelen JPEG'i kabul eder (4 MB sınırı, alan denetimi, bekleyen
+   100'e ulaşınca yeni yükleme almaz) ve dosyayı **özel erişimli** Vercel Blob deposunda `bekleyen/`
+   altına koyar. Depo adresleri dışarıdan açılmaz, hiçbir yanıtta dönmez.
+3. `GET /api/bekleyen` yalnız bekleyen sayısını verir; bakımcıya bildirim bu sayıdan üretilir.
+4. Bakımcı `python3 yukleme.py liste | indir | isaretle <ad>` ile kuyruğu inceler, fiyatları
+   `fiyatlar.csv`'ye işler, siteyi yeniden dağıtır. İncelenen yükleme silinmez, `islenen/` altına
+   işaret konur.
+
+Bilinen eksik: IP başına hız sınırı yok; kötüye kullanıma karşı tek fren kuyruk sınırıdır.
 
 ## Dosyalar
 
@@ -32,6 +48,8 @@ faydalanabilir. Şimdilik tek kişinin gözlemleridir; fotoğraf yükleme akış
 | `yerler.csv` | **Kaynak.** Havalimanı / mağaza listesi (IATA kodu, Türkçe ve İngilizce ad, ülke, mağaza, konum, arama sözcükleri) |
 | `piyasa.csv` | **Kaynak.** Mağaza dışı referans fiyatlar: ülke, tür (`yerel` · `öneri` · `duty-free` · `müzayede`), `fiyatlar.csv` ile eşleşen marka + ürün anahtarı, fiyat aralığı, kur, kaynak adresi |
 | `db_kur.py` | Üç CSV'den SQLite `fiyatlar.db`'yi kurar (`yer`, `gozlem`, `piyasa` tabloları) |
+| `site/api/` | Vercel işlevleri: `yukle.js` (fotoğraf kabul), `bekleyen.js` (sayaç), `_ortak.js` |
+| `yukleme.py` | Yükleme kuyruğunu inceleme aracı (Vercel CLI üzerinden) |
 | `sayfa_kur.py`, `sayfa_sablon.html` | Tek dosyalık kıyas sayfasını üretir (veri içine gömülü): `site/index.html` yayın sürümü. CSV'deki Türkçe açıklamaları İngilizceye çevirir; çevrilmemiş metin kalırsa durur |
 
 ```bash

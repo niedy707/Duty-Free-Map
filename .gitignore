@@ -8,5 +8,8 @@ ozel/
 CLAUDE.md
 TODO.md
 COZUMLER.md
-site/
-.vercel
+# Yayın klasörü: api/ ve yapılandırma depoda; üretilen sayfa, bağımlılıklar ve Vercel CLI dosyaları değil
+site/index.html
+site/node_modules/
+site/.vercel/
+site/.env*
